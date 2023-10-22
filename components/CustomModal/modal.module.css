@@ -27,7 +27,7 @@
   padding: 0.5rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: rgba(54, 47, 120, 1);
+  color: var(--primary-black);
 }
 
 .close_btn {

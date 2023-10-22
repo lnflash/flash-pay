@@ -31,7 +31,7 @@
   width: 80%;
   font-weight: 600;
   font-size: 21px;
-  color: #61637a;
+  color: var(--primary-black);
   height: 100vh;
   font-size: 18px;
 }
@@ -44,7 +44,6 @@
 }
 
 .nav_menu a {
-  color: #61637a;
   text-decoration: none;
   font-size: 18px;
   display: flex;
@@ -96,12 +95,11 @@
 }
 
 .lightning_addr > div:nth-child(2) button {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    linear-gradient(45deg, #ffbe0b 0%, #fb5607 100%);
+  background: var(--linear-gradient);
   color: #fff;
   padding: 0.45rem 0.75rem;
   border-radius: 8px;
-  border: none;
+  border: 1px solid var(--primary-white);
   display: flex;
   align-items: center;
   column-gap: 5px;
@@ -111,7 +109,7 @@
 }
 
 .lightning_addr > div:nth-child(2) button:hover {
-  border: 1px solid rgba(22, 31, 71, 0.414);
+  border: 1px solid var(--secondary-green);
 }
 
 .hamburger {
@@ -132,7 +130,7 @@
 }
 
 .hamburger > .toggle:last-child {
-  background-color: rgba(83, 111, 242, 1);
+  background: var(--linear-gradient);
   transform: rotateY(-40deg);
   -webkit-transform: rotate(-40deg);
   -moz-transform: rotate(-40deg);
@@ -150,8 +148,7 @@
   -moz-transform: rotate(40deg);
   -o-transform: rotate(40deg);
   -ms-transform: rotate(40deg);
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    linear-gradient(45deg, #ffbe0b 0%, #fb5607 100%);
+  background: var(--linear-gradient);
 }
 
 .main {
@@ -167,8 +164,7 @@
 
 .divider {
   height: 2px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    linear-gradient(45deg, #ffbe0b 0%, #fb5607 100%);
+  background: var(--linear-gradient);
   opacity: 0.5;
 }
 

@@ -1,0 +1,10 @@
+:root {
+    --primary-yellow: #fff200;
+    --primary-white: #fff;
+    --primary-black: #000;
+    --secondary-green: #41ad49;
+    --secondary-red: #d12229;
+    --secondary-gray: #eee;
+    --linear-gradient: linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
+    linear-gradient(45deg, var(--primary-yellow) 0%, var(--secondary-green) 100%);
+}
