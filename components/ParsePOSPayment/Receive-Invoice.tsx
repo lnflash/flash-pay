@@ -57,7 +57,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
 
   const shareData = {
     title: `Pay ${username}`,
-    text: `Use the link embedded below to pay ${username} some sats. Powered by: https://galoy.io`,
+    text: `Use the link embedded below to pay ${username} some sats. Powered by: https://getflash.io`,
     url: shareUrl,
   }
 

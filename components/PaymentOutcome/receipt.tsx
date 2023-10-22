@@ -60,7 +60,7 @@ function receipt(props: Props) {
         </div>
         <a
           className={styles.link}
-          href="https://galoy.io"
+          href="https://getflash.io"
           target="_blank"
           rel="noreferrer"
         >
