@@ -56,7 +56,7 @@ export default function Invoice({
             <QRCode
               value={`${paymentRequest}`}
               size={320}
-              logoImage="/blink-qr-logo.png"
+              logoImage="/flash-qr-logo.png"
               logoWidth={100}
             />
           </div>

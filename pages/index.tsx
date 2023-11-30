@@ -49,7 +49,7 @@ function Home() {
       <br />
       <Row>
         <Col>
-          <h2>Connect to the Blink Node</h2>
+          <h2>Connect to the Flash Node</h2>
           <br />
           <Jumbotron>
             <Container>
@@ -75,7 +75,7 @@ function Home() {
                             "Loading..."
                           ) : (
                             <a href={nodeUrl + `${data.globals.nodesIds[0]}`}>
-                              Connect the Blink node
+                              Connect the Flash node
                             </a>
                           )}
                         </ListGroup.Item>
@@ -88,7 +88,7 @@ function Home() {
                             }
                           >
                             <label htmlFor="username">
-                              To use the <strong>POS</strong> app, enter your blink (BBW)
+                              To use the <strong>POS</strong> app, enter your Flash
                               username
                             </label>
                             <input

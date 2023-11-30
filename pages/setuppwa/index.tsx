@@ -52,9 +52,9 @@ const SetupPwa = () => {
           autoComplete="off"
           onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleSubmit(event)}
         >
-          <h4>Welcome to Blink POS application.</h4>
+          <h4>Welcome to Flash POS application.</h4>
           <label htmlFor="username">
-            To use the app, enter the Blink username you would like to receive payments
+            To use the app, enter the Flash username you would like to receive payments
             for.
           </label>
           <input

@@ -78,7 +78,7 @@ export default function ({
                       ecLevel="H"
                       value={qrCodeURL}
                       size={800}
-                      logoImage="/blink-qr-logo.png"
+                      logoImage="/flash-qr-logo.png"
                       logoWidth={250}
                     />
                     <Card.Text>
@@ -113,7 +113,7 @@ export default function ({
                     ecLevel="H"
                     value={qrCodeURL}
                     size={300}
-                    logoImage="/blink-qr-logo.png"
+                    logoImage="/flash-qr-logo.png"
                     logoWidth={100}
                   />
                 </Card.Text>
