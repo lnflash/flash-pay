@@ -27,8 +27,8 @@ export default function Layout({
         <meta name="description" content={APP_DESCRIPTION} />
         <meta name="theme-color" content="#536FF2" />
         <meta name="apple-mobile-web-app-status-bar" content="#536FF2" />
-        <link rel="apple-touch-icon" href="/APPLE-ICON.png" />
-        <link rel="icon" type="image/png" href="/APPLE-ICON.png" />
+        <link rel="apple-touch-icon" href="/FLASH-ICON.png" />
+        <link rel="icon" type="image/png" href="/FLASH-ICON.png" />
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=UA-181044262-1"
@@ -44,7 +44,7 @@ export default function Layout({
     `,
           }}
         />
-        <title>BitcoinBeach Cash Register</title>
+        <title>Flash Cash Register</title>
       </Head>
       <GraphQLProvider>
         <AppLayout username={username}>

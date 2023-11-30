@@ -7,7 +7,7 @@ function Header() {
     <Navbar bg="dark">
       <Container>
         <Navbar.Brand href="https://bitcoinbeach.com">
-          <Image src="/BBLogo.png" rounded />
+          <Image src="/FlashLogo.png" rounded />
         </Navbar.Brand>
       </Container>
     </Navbar>

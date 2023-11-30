@@ -1,8 +1,8 @@
 .index {
   list-style: none;
   border: none;
-  background-color: #e0e3f3;
-  color: rgb(99, 116, 195);
+  background-color: var(--primary-yellow);
+  color: var(--primary-black);
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -13,7 +13,7 @@
 }
 
 .text {
-  color: rgba(54, 47, 120, 1);
+  color: var(--primary-black);
   font-size: 1rem;
   font-weight: 400;
 }

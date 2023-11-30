@@ -39,7 +39,7 @@ const AppLayout = ({ children, username }: Props) => {
     <div className={`${openSideBar && styles.container_bg} ${styles.container}`}>
       <nav className={styles.nav_bar}>
         <a href={`/${username}`} style={{ cursor: "pointer" }}>
-          <Image src="/icons/blink-logo-icon.svg" alt="logo" width="50" height="50" />
+          <Image src="/icons/flash-logo-icon.svg" alt="logo" width="50" height="50" />
         </a>
         <div onClick={() => setOpenSideBar(!openSideBar)} className={styles.hamburger}>
           <span className={`${openSideBar && styles.toggle}`}></span>
@@ -133,11 +133,11 @@ const AppLayout = ({ children, username }: Props) => {
       <main className={`${openSideBar && styles.main_bg} ${styles.main}`}>
         {children}
         <div className={styles.footer}>
-          <a href="https://galoy.io" target="_blank" rel="noreferrer">
+          <a href="https://getflash.io" target="_blank" rel="noreferrer">
             <span>Powered by</span>
             <Image
-              src="/icons/galoy-logo-text-icon.svg"
-              alt="galoy-logo"
+              src="/icons/flash-logo-text-icon.svg"
+              alt="flash-logo"
               width={50}
               height={50}
             />

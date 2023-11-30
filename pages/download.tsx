@@ -21,7 +21,7 @@ function DownloadApp() {
   return (
     <Container>
       <br />
-      <h3>Download the Blink Wallet</h3>
+      <h3>Download the Flash Wallet</h3>
       <br />
       <Row>
         <Col>
