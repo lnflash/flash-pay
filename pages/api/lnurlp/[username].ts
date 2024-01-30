@@ -35,7 +35,17 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-const ACCOUNT_DEFAULT_WALLET = gql`
+// const ACCOUNT_DEFAULT_WALLET = gql`
+//   query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
+//     accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
+//       __typename
+//       id
+//       walletCurrency
+//     }
+//   }
+// `
+
+const LNURL_DEFAULT_WALLET = gql`
   query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
     accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
       __typename
@@ -44,7 +54,6 @@ const ACCOUNT_DEFAULT_WALLET = gql`
     }
   }
 `
-
 const LNURL_INVOICE = gql`
   mutation lnInvoiceCreateOnBehalfOfRecipient(
     $walletId: WalletId!
@@ -135,102 +144,124 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   const url = originalUrl(req)
   const accountUsername = username ? username.toString() : ""
 
-  const walletId = await getUserWalletId(accountUsername, req)
-  if (!walletId) {
+  console.log(`accountUsername = ${accountUsername}`)
+  // const walletId = await getUserWalletId(accountUsername, req)
+  const lnurl = await getLnurl(accountUsername, req)
+  if (!lnurl) {
     return res.json({
       status: "ERROR",
       reason: `Couldn't find user '${username}'.`,
     })
   }
 
+  // Move to flash server?
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${accountUsername}`],
     ["text/identifier", `${accountUsername}@${url.hostname}`],
   ])
 
   // lnurl options call
-  if (!amount) {
-    return res.json({
-      callback: url.full,
-      minSendable: 1000,
-      maxSendable: 100000000000,
-      metadata: metadata,
-      tag: "payRequest",
-      ...(nostrEnabled
-        ? {
-            allowsNostr: true,
-            nostrPubkey: NOSTR_PUBKEY,
-          }
-        : {}),
-    })
-  }
+  // if (!amount) {
+  //   return res.json({
+  //     callback: url.full,
+  //     minSendable: 1000,
+  //     maxSendable: 100000000000,
+  //     metadata: metadata,
+  //     tag: "payRequest",
+  //     ...(nostrEnabled
+  //       ? {
+  //           allowsNostr: true,
+  //           nostrPubkey: NOSTR_PUBKEY,
+  //         }
+  //       : {}),
+  //   })
+  // }
 
   // lnurl generate invoice
-  try {
-    if (Array.isArray(amount) || Array.isArray(nostr)) {
-      throw new Error("Invalid request")
-    }
+  // try {
+  //   if (Array.isArray(amount) || Array.isArray(nostr)) {
+  //     throw new Error("Invalid request")
+  //   }
 
-    const amountSats = Math.round(parseInt(amount, 10) / 1000)
-    if ((amountSats * 1000).toString() !== amount) {
-      return res.json({
-        status: "ERROR",
-        reason: "Millisatoshi amount is not supported, please send a value in full sats.",
-      })
-    }
+  //   const amountSats = Math.round(parseInt(amount, 10) / 1000)
+  //   if ((amountSats * 1000).toString() !== amount) {
+  //     return res.json({
+  //       status: "ERROR",
+  //       reason: "Millisatoshi amount is not supported, please send a value in full sats.",
+  //     })
+  //   }
 
-    let descriptionHash: string
+  //   let descriptionHash: string
 
-    if (nostrEnabled && nostr) {
-      descriptionHash = crypto.createHash("sha256").update(nostr).digest("hex")
-    } else {
-      descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
-    }
+  //   if (nostrEnabled && nostr) {
+  //     descriptionHash = crypto.createHash("sha256").update(nostr).digest("hex")
+  //   } else {
+  //     descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
+  //   }
 
-    const { invoice, errors } = await createInvoice({
-      walletId,
-      amount: amountSats,
-      descriptionHash,
-    })
+  //   const { invoice, errors } = await createInvoice({
+  //     walletId,
+  //     amount: amountSats,
+  //     descriptionHash,
+  //   })
 
-    if ((errors && errors.length) || !invoice) {
-      console.log("error getting invoice", errors)
-      return res.json({
-        status: "ERROR",
-        reason: `Failed to get invoice: ${errors ? errors[0].message : "unknown error"}`,
-      })
-    }
+  //   if ((errors && errors.length) || !invoice) {
+  //     console.log("error getting invoice", errors)
+  //     return res.json({
+  //       status: "ERROR",
+  //       reason: `Failed to get invoice: ${errors ? errors[0].message : "unknown error"}`,
+  //     })
+  //   }
 
-    if (nostrEnabled && nostr && redis) {
-      redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
-    }
+  //   if (nostrEnabled && nostr && redis) {
+  //     redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
+  //   }
 
-    return res.json({
-      pr: invoice.paymentRequest,
-      routes: [],
-    })
-  } catch (err: unknown) {
-    console.log("unexpected error getting invoice", err)
-    res.json({
-      status: "ERROR",
-      reason: err instanceof Error ? err.message : "unexpected error",
-    })
-  }
+  //   return res.json({
+  //     pr: invoice.paymentRequest,
+  //     routes: [],
+  //   })
+  // } catch (err: unknown) {
+  //   console.log("unexpected error getting invoice", err)
+  //   res.json({
+  //     status: "ERROR",
+  //     reason: err instanceof Error ? err.message : "unexpected error",
+  //   })
+  // }
 }
 
-const getUserWalletId = async (accountUsername: string, req: NextApiRequest) => {
+// const getUserWalletId = async (accountUsername: string, req: NextApiRequest) => {
+//   try {
+//     const { data } = await client.query({
+//       query: ACCOUNT_DEFAULT_WALLET,
+//       variables: { username: accountUsername, walletCurrency: "USD" },
+//       context: {
+//         "x-real-ip": req.headers["x-real-ip"],
+//         "x-forwarded-for": req.headers["x-forwarded-for"],
+//       },
+//     })
+//     console.log(`data = ${data}`)
+//     return data?.accountDefaultWallet?.id
+//   } catch (err) {
+//     console.log("error getting user wallet id:", err)
+//     return undefined
+//   }
+// }
+
+const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
   try {
     const { data } = await client.query({
-      query: ACCOUNT_DEFAULT_WALLET,
-      variables: { username: accountUsername, walletCurrency: "BTC" },
+      query: LNURL_DEFAULT_WALLET,
+      variables: { username: accountUsername, walletCurrency: "USD" },
       context: {
         "x-real-ip": req.headers["x-real-ip"],
         "x-forwarded-for": req.headers["x-forwarded-for"],
       },
     })
+    console.log(`data = ${data}`)
     return data?.accountDefaultWallet?.id
   } catch (err) {
     console.log("error getting user wallet id:", err)
     return undefined
   }
-}
+}  
