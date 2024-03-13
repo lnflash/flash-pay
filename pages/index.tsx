@@ -49,7 +49,7 @@ function Home() {
       <br />
       <Row>
         <Col>
-          <h2>Connect to the Flash Node</h2>
+          <h2>Welcome the Flash Cash Register</h2>
           <br />
           <Jumbotron>
             <Container>
@@ -58,7 +58,7 @@ function Home() {
                   <Card>
                     <Card.Body>
                       <ListGroup variant="flush">
-                        <ListGroup.Item>
+                        {/* <ListGroup.Item>
                           <label>Node Public Key: </label>{" "}
                           <p style={{ fontSize: "small", overflowWrap: "break-word" }}>
                             {error
@@ -67,8 +67,8 @@ function Home() {
                               ? "Loading..."
                               : data.globals.nodesIds[0]}
                           </p>
-                        </ListGroup.Item>
-                        <ListGroup.Item>
+                        </ListGroup.Item> */}
+                        {/* <ListGroup.Item>
                           {error ? (
                             "Unavailable"
                           ) : loading ? (
@@ -78,7 +78,7 @@ function Home() {
                               Connect the Flash node
                             </a>
                           )}
-                        </ListGroup.Item>
+                        </ListGroup.Item> */}
                         <ListGroup.Item>
                           <form
                             className="username-form"
@@ -88,7 +88,7 @@ function Home() {
                             }
                           >
                             <label htmlFor="username">
-                              To use the <strong>POS</strong> app, enter your Flash
+                              To use the <strong>Cash Register</strong>, enter your Flash
                               username
                             </label>
                             <input
