@@ -117,15 +117,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).end()
   }
 
-  console.log("UPDATED")
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
   return res.json({
-      ...details,
       callback: details.callback, 
       maxSendable: details.max, 
       minSendable: details.min, 
       metadata: details.metadata, 
       tag: "payRequest",
+      domain: details.domain,
+      description: details.description,
+      image: details.image,
+      commentAllowed: details.commentAllowed,
       identifier: `${accountUsername}@${originalUrl(req).hostname}` // not part of lud6 
   })
   
