@@ -109,13 +109,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       reason: `Couldn't find user '${username}'.`,
     })
   }
+
+   
   const details = await requestPayServiceParams({ lnUrlOrAddress: lnurl })
   if (!details) {
     console.log(`Failed to parse: ${lnurl}`)
     return res.status(500).end()
   }
-  details.identifier = `${accountUsername}@${originalUrl(req).hostname}`
-  return res.json(details)
+
+  console.log("UPDATED")
+  // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
+  return res.json({
+      ...details,
+      callback: details.callback, 
+      maxSendable: details.max, 
+      minSendable: details.min, 
+      metadata: details.metadata, 
+      tag: "payRequest",
+      identifier: `${accountUsername}@${originalUrl(req).hostname}` // not part of lud6 
+  })
   
   // const metadata = JSON.stringify([
   //   ["text/plain", `Payment to ${accountUsername}`],
