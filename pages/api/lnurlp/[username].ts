@@ -90,7 +90,7 @@ const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
 
 //   redis.on("error", (err) => console.log({ err }, "Redis error"))
 // }
- 
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   // console.log(NOSTR_PUBKEY)
 
@@ -110,7 +110,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-   
   const details = await requestPayServiceParams({ lnUrlOrAddress: lnurl })
   if (!details) {
     console.log(`Failed to parse: ${lnurl}`)
@@ -119,18 +118,18 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
   return res.json({
-      callback: details.callback, 
-      maxSendable: details.max, 
-      minSendable: details.min, 
-      metadata: details.metadata, 
-      tag: "payRequest",
-      domain: details.domain,
-      description: details.description,
-      image: details.image,
-      commentAllowed: details.commentAllowed,
-      identifier: `${accountUsername}@${originalUrl(req).hostname}` // not part of lud6 
+    callback: details.callback,
+    maxSendable: details.max,
+    minSendable: details.min,
+    metadata: details.metadata,
+    tag: "payRequest",
+    domain: details.domain,
+    description: details.description,
+    image: details.image,
+    commentAllowed: details.commentAllowed,
+    identifier: `${accountUsername}@${originalUrl(req).hostname}`, // not part of lud6
   })
-  
+
   // const metadata = JSON.stringify([
   //   ["text/plain", `Payment to ${accountUsername}`],
   //   ["text/identifier", `${accountUsername}@${url.hostname}`],
@@ -154,5 +153,4 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   //   if (nostrEnabled && nostr && redis) {
   //     redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
   //   }
-
 }
