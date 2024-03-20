@@ -1,4 +1,4 @@
-# Galoy Pay
+# Flash Pay
 
 ## What is it for?
 
