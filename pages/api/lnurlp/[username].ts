@@ -90,7 +90,7 @@ const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
 
 //   redis.on("error", (err) => console.log({ err }, "Redis error"))
 // }
- 
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   // console.log(NOSTR_PUBKEY)
 
@@ -116,7 +116,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
   details.identifier = `${accountUsername}@${originalUrl(req).hostname}`
   return res.json(details)
-  
+
   // const metadata = JSON.stringify([
   //   ["text/plain", `Payment to ${accountUsername}`],
   //   ["text/identifier", `${accountUsername}@${url.hostname}`],
@@ -140,5 +140,4 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   //   if (nostrEnabled && nostr && redis) {
   //     redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
   //   }
-
 }
