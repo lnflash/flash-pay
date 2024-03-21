@@ -29,6 +29,13 @@ export type Scalars = {
   CountryCode: string
   /** Display currency of an account */
   DisplayCurrency: string
+  /** Email address */
+  EmailAddress: string
+  /** An id to be passed between registrationInitiate and registrationValidate for confirming email */
+  EmailRegistrationId: string
+  EndpointId: string
+  /** Url that will be fetched on events for the account */
+  EndpointUrl: string
   /** Feedback shared with our user */
   Feedback: string
   /** Hex-encoded string of 32 bytes */
@@ -38,10 +45,13 @@ export type Scalars = {
   /** BOLT11 lightning invoice payment request with the amount included */
   LnPaymentRequest: string
   LnPaymentSecret: string
+  /** A bech32-encoded HTTPS/Onion URL that can be interacted with automatically by a WALLET in a standard way such that a SERVICE can provide extra services or a better experience for the user. Ref: https://github.com/lnurl/luds/blob/luds/01.md  */
+  Lnurl: string
   /** Text field in a lightning payment transaction */
   Memo: string
   /** (Positive) amount of minutes */
   Minutes: string
+  NotificationCategory: string
   /** An address for an on-chain bitcoin destination */
   OnChainAddress: string
   OnChainTxHash: string
@@ -60,10 +70,14 @@ export type Scalars = {
   SignedAmount: number
   /** A string amount (of a currency) that can be negative (e.g. in a transaction) */
   SignedDisplayMajorAmount: string
-  /** (Positive) Number of blocks in which the transaction is expected to be confirmed */
-  TargetConfirmations: number
   /** Timestamp field, serialized as Unix time (the number of seconds since the Unix epoch) */
   Timestamp: number
+  /** A time-based one-time password */
+  TotpCode: string
+  /** An id to be passed between set and verify for confirming totp */
+  TotpRegistrationId: string
+  /** A secret to generate time-based one-time password */
+  TotpSecret: string
   /** Unique identifier of a user */
   Username: string
   /** Unique identifier of a wallet */
@@ -71,12 +85,14 @@ export type Scalars = {
 }
 
 export type Account = {
+  readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>
   readonly csvTransactions: Scalars["String"]
   readonly defaultWalletId: Scalars["WalletId"]
   readonly displayCurrency: Scalars["DisplayCurrency"]
   readonly id: Scalars["ID"]
   readonly level: AccountLevel
   readonly limits: AccountLimits
+  readonly notificationSettings: NotificationSettings
   readonly realtimePrice: RealtimePrice
   readonly transactions?: Maybe<TransactionConnection>
   readonly wallets: ReadonlyArray<Wallet>
@@ -98,6 +114,24 @@ export type AccountDeletePayload = {
   readonly __typename: "AccountDeletePayload"
   readonly errors: ReadonlyArray<Error>
   readonly success: Scalars["Boolean"]
+}
+
+export type AccountDisableNotificationCategoryInput = {
+  readonly category: Scalars["NotificationCategory"]
+  readonly channel?: InputMaybe<NotificationChannel>
+}
+
+export type AccountDisableNotificationChannelInput = {
+  readonly channel: NotificationChannel
+}
+
+export type AccountEnableNotificationCategoryInput = {
+  readonly category: Scalars["NotificationCategory"]
+  readonly channel?: InputMaybe<NotificationChannel>
+}
+
+export type AccountEnableNotificationChannelInput = {
+  readonly channel: NotificationChannel
 }
 
 export const AccountLevel = {
@@ -146,10 +180,17 @@ export type AccountUpdateDisplayCurrencyPayload = {
   readonly errors: ReadonlyArray<Error>
 }
 
+export type AccountUpdateNotificationSettingsPayload = {
+  readonly __typename: "AccountUpdateNotificationSettingsPayload"
+  readonly account?: Maybe<ConsumerAccount>
+  readonly errors: ReadonlyArray<Error>
+}
+
 export type AuthTokenPayload = {
   readonly __typename: "AuthTokenPayload"
   readonly authToken?: Maybe<Scalars["AuthToken"]>
   readonly errors: ReadonlyArray<Error>
+  readonly totpRequired?: Maybe<Scalars["Boolean"]>
 }
 
 /** A wallet belonging to an account which contains a BTC balance and a list of transactions. */
@@ -159,6 +200,7 @@ export type BtcWallet = Wallet & {
   /** A balance stored in BTC. */
   readonly balance: Scalars["SignedAmount"]
   readonly id: Scalars["ID"]
+  readonly lnurlp?: Maybe<Scalars["Lnurl"]>
   /** An unconfirmed incoming onchain balance. */
   readonly pendingIncomingBalance: Scalars["SignedAmount"]
   /** A list of BTC transactions associated with this wallet. */
@@ -186,9 +228,29 @@ export type BtcWalletTransactionsByAddressArgs = {
 
 export type BuildInformation = {
   readonly __typename: "BuildInformation"
-  readonly buildTime?: Maybe<Scalars["Timestamp"]>
   readonly commitHash?: Maybe<Scalars["String"]>
   readonly helmRevision?: Maybe<Scalars["Int"]>
+}
+
+export type CallbackEndpoint = {
+  readonly __typename: "CallbackEndpoint"
+  readonly id: Scalars["EndpointId"]
+  readonly url: Scalars["EndpointUrl"]
+}
+
+export type CallbackEndpointAddInput = {
+  /** callback endpoint to be called */
+  readonly url: Scalars["EndpointUrl"]
+}
+
+export type CallbackEndpointAddPayload = {
+  readonly __typename: "CallbackEndpointAddPayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly id?: Maybe<Scalars["EndpointId"]>
+}
+
+export type CallbackEndpointDeleteInput = {
+  readonly id: Scalars["EndpointId"]
 }
 
 export type CaptchaCreateChallengePayload = {
@@ -221,6 +283,7 @@ export type CentAmountPayload = {
 
 export type ConsumerAccount = Account & {
   readonly __typename: "ConsumerAccount"
+  readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>
   /** return CSV stream, base64 encoded, of the list of transactions in the wallet */
   readonly csvTransactions: Scalars["String"]
   readonly defaultWalletId: Scalars["WalletId"]
@@ -228,6 +291,7 @@ export type ConsumerAccount = Account & {
   readonly id: Scalars["ID"]
   readonly level: AccountLevel
   readonly limits: AccountLimits
+  readonly notificationSettings: NotificationSettings
   /** List the quiz questions of the consumer account */
   readonly quiz: ReadonlyArray<Quiz>
   readonly realtimePrice: RealtimePrice
@@ -280,6 +344,12 @@ export type DepositFeesInformation = {
 
 export type DeviceNotificationTokenCreateInput = {
   readonly deviceToken: Scalars["String"]
+}
+
+export type Email = {
+  readonly __typename: "Email"
+  readonly address?: Maybe<Scalars["EmailAddress"]>
+  readonly verified?: Maybe<Scalars["Boolean"]>
 }
 
 export type Error = {
@@ -572,8 +642,14 @@ export type MobileVersions = {
 export type Mutation = {
   readonly __typename: "Mutation"
   readonly accountDelete: AccountDeletePayload
+  readonly accountDisableNotificationCategory: AccountUpdateNotificationSettingsPayload
+  readonly accountDisableNotificationChannel: AccountUpdateNotificationSettingsPayload
+  readonly accountEnableNotificationCategory: AccountUpdateNotificationSettingsPayload
+  readonly accountEnableNotificationChannel: AccountUpdateNotificationSettingsPayload
   readonly accountUpdateDefaultWalletId: AccountUpdateDefaultWalletIdPayload
   readonly accountUpdateDisplayCurrency: AccountUpdateDisplayCurrencyPayload
+  readonly callbackEndpointAdd: CallbackEndpointAddPayload
+  readonly callbackEndpointDelete: SuccessPayload
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload
   readonly captchaRequestAuthCode: SuccessPayload
   readonly deviceNotificationTokenCreate: SuccessPayload
@@ -659,15 +735,39 @@ export type Mutation = {
   readonly quizCompleted: QuizCompletedPayload
   /** @deprecated will be moved to AccountContact */
   readonly userContactUpdateAlias: UserContactUpdateAliasPayload
+  readonly userEmailDelete: UserEmailDeletePayload
+  readonly userEmailRegistrationInitiate: UserEmailRegistrationInitiatePayload
+  readonly userEmailRegistrationValidate: UserEmailRegistrationValidatePayload
   readonly userLogin: AuthTokenPayload
   readonly userLoginUpgrade: UpgradePayload
-  readonly userLogout: AuthTokenPayload
+  readonly userLogout: SuccessPayload
+  readonly userPhoneDelete: UserPhoneDeletePayload
+  readonly userPhoneRegistrationInitiate: SuccessPayload
+  readonly userPhoneRegistrationValidate: UserPhoneRegistrationValidatePayload
   /** @deprecated Use QuizCompletedMutation instead */
   readonly userQuizQuestionUpdateCompleted: UserQuizQuestionUpdateCompletedPayload
-  readonly userRequestAuthCode: SuccessPayload
+  readonly userTotpDelete: UserTotpDeletePayload
+  readonly userTotpRegistrationInitiate: UserTotpRegistrationInitiatePayload
+  readonly userTotpRegistrationValidate: UserTotpRegistrationValidatePayload
   readonly userUpdateLanguage: UserUpdateLanguagePayload
   /** @deprecated Username will be moved to @Handle in Accounts. Also SetUsername naming should be used instead of UpdateUsername to reflect the idempotency of Handles */
   readonly userUpdateUsername: UserUpdateUsernamePayload
+}
+
+export type MutationAccountDisableNotificationCategoryArgs = {
+  input: AccountDisableNotificationCategoryInput
+}
+
+export type MutationAccountDisableNotificationChannelArgs = {
+  input: AccountDisableNotificationChannelInput
+}
+
+export type MutationAccountEnableNotificationCategoryArgs = {
+  input: AccountEnableNotificationCategoryInput
+}
+
+export type MutationAccountEnableNotificationChannelArgs = {
+  input: AccountEnableNotificationChannelInput
 }
 
 export type MutationAccountUpdateDefaultWalletIdArgs = {
@@ -676,6 +776,14 @@ export type MutationAccountUpdateDefaultWalletIdArgs = {
 
 export type MutationAccountUpdateDisplayCurrencyArgs = {
   input: AccountUpdateDisplayCurrencyInput
+}
+
+export type MutationCallbackEndpointAddArgs = {
+  input: CallbackEndpointAddInput
+}
+
+export type MutationCallbackEndpointDeleteArgs = {
+  input: CallbackEndpointDeleteInput
 }
 
 export type MutationCaptchaRequestAuthCodeArgs = {
@@ -782,6 +890,14 @@ export type MutationUserContactUpdateAliasArgs = {
   input: UserContactUpdateAliasInput
 }
 
+export type MutationUserEmailRegistrationInitiateArgs = {
+  input: UserEmailRegistrationInitiateInput
+}
+
+export type MutationUserEmailRegistrationValidateArgs = {
+  input: UserEmailRegistrationValidateInput
+}
+
 export type MutationUserLoginArgs = {
   input: UserLoginInput
 }
@@ -791,15 +907,31 @@ export type MutationUserLoginUpgradeArgs = {
 }
 
 export type MutationUserLogoutArgs = {
-  input: UserLogoutInput
+  input?: InputMaybe<UserLogoutInput>
+}
+
+export type MutationUserPhoneRegistrationInitiateArgs = {
+  input: UserPhoneRegistrationInitiateInput
+}
+
+export type MutationUserPhoneRegistrationValidateArgs = {
+  input: UserPhoneRegistrationValidateInput
 }
 
 export type MutationUserQuizQuestionUpdateCompletedArgs = {
   input: UserQuizQuestionUpdateCompletedInput
 }
 
-export type MutationUserRequestAuthCodeArgs = {
-  input: UserRequestAuthCodeInput
+export type MutationUserTotpDeleteArgs = {
+  input: UserTotpDeleteInput
+}
+
+export type MutationUserTotpRegistrationInitiateArgs = {
+  input: UserTotpRegistrationInitiateInput
+}
+
+export type MutationUserTotpRegistrationValidateArgs = {
+  input: UserTotpRegistrationValidateInput
 }
 
 export type MutationUserUpdateLanguageArgs = {
@@ -825,6 +957,23 @@ export const Network = {
 } as const
 
 export type Network = (typeof Network)[keyof typeof Network]
+export const NotificationChannel = {
+  Push: "PUSH",
+} as const
+
+export type NotificationChannel =
+  (typeof NotificationChannel)[keyof typeof NotificationChannel]
+export type NotificationChannelSettings = {
+  readonly __typename: "NotificationChannelSettings"
+  readonly disabledCategories: ReadonlyArray<Scalars["NotificationCategory"]>
+  readonly enabled: Scalars["Boolean"]
+}
+
+export type NotificationSettings = {
+  readonly __typename: "NotificationSettings"
+  readonly push: NotificationChannelSettings
+}
+
 export type OnChainAddressCreateInput = {
   readonly walletId: Scalars["WalletId"]
 }
@@ -843,8 +992,6 @@ export type OnChainPaymentSendAllInput = {
   readonly address: Scalars["OnChainAddress"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
   readonly speed?: InputMaybe<PayoutSpeed>
-  /** @deprecated Ignored - will be replaced */
-  readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
 
@@ -853,16 +1000,12 @@ export type OnChainPaymentSendInput = {
   readonly amount: Scalars["SatAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
   readonly speed?: InputMaybe<PayoutSpeed>
-  /** @deprecated Ignored - will be replaced */
-  readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
 
 export type OnChainTxFee = {
   readonly __typename: "OnChainTxFee"
   readonly amount: Scalars["SatAmount"]
-  /** @deprecated Ignored - will be removed */
-  readonly targetConfirmations: Scalars["TargetConfirmations"]
 }
 
 export type OnChainUpdate = {
@@ -881,8 +1024,6 @@ export type OnChainUsdPaymentSendAsBtcDenominatedInput = {
   readonly amount: Scalars["SatAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
   readonly speed?: InputMaybe<PayoutSpeed>
-  /** @deprecated Ignored - will be replaced */
-  readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
 
@@ -891,16 +1032,12 @@ export type OnChainUsdPaymentSendInput = {
   readonly amount: Scalars["CentAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
   readonly speed?: InputMaybe<PayoutSpeed>
-  /** @deprecated Ignored - will be replaced */
-  readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
 
 export type OnChainUsdTxFee = {
   readonly __typename: "OnChainUsdTxFee"
   readonly amount: Scalars["CentAmount"]
-  /** @deprecated Ignored - will be removed */
-  readonly targetConfirmations: Scalars["TargetConfirmations"]
 }
 
 export type OneDayAccountLimit = AccountLimit & {
@@ -1030,6 +1167,7 @@ export type PricePoint = {
 export type PublicWallet = {
   readonly __typename: "PublicWallet"
   readonly id: Scalars["ID"]
+  readonly lnurlp?: Maybe<Scalars["Lnurl"]>
   readonly walletCurrency: WalletCurrency
 }
 
@@ -1078,7 +1216,6 @@ export type QueryOnChainTxFeeArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["SatAmount"]
   speed?: InputMaybe<PayoutSpeed>
-  targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
 
@@ -1086,7 +1223,6 @@ export type QueryOnChainUsdTxFeeArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["CentAmount"]
   speed?: InputMaybe<PayoutSpeed>
-  targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
 
@@ -1094,7 +1230,6 @@ export type QueryOnChainUsdTxFeeAsBtcDenominatedArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["SatAmount"]
   speed?: InputMaybe<PayoutSpeed>
-  targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
 
@@ -1298,6 +1433,7 @@ export type UsdWallet = Wallet & {
   readonly accountId: Scalars["ID"]
   readonly balance: Scalars["SignedAmount"]
   readonly id: Scalars["ID"]
+  readonly lnurlp?: Maybe<Scalars["Lnurl"]>
   /** An unconfirmed incoming onchain balance. */
   readonly pendingIncomingBalance: Scalars["SignedAmount"]
   readonly transactions?: Maybe<TransactionConnection>
@@ -1338,6 +1474,8 @@ export type User = {
   readonly contacts: ReadonlyArray<UserContact>
   readonly createdAt: Scalars["Timestamp"]
   readonly defaultAccount: Account
+  /** Email address */
+  readonly email?: Maybe<Email>
   readonly id: Scalars["ID"]
   /**
    * Preferred language for user.
@@ -1351,6 +1489,8 @@ export type User = {
    * @deprecated use Quiz from Account instead
    */
   readonly quizQuestions: ReadonlyArray<UserQuizQuestion>
+  /** Whether TOTP is enabled for this user. */
+  readonly totpEnabled: Scalars["Boolean"]
   /**
    * Optional immutable user friendly identifier.
    * @deprecated will be moved to @Handle in Account and Wallet
@@ -1395,6 +1535,34 @@ export type UserContactUpdateAliasPayload = {
   readonly errors: ReadonlyArray<Error>
 }
 
+export type UserEmailDeletePayload = {
+  readonly __typename: "UserEmailDeletePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
+}
+
+export type UserEmailRegistrationInitiateInput = {
+  readonly email: Scalars["EmailAddress"]
+}
+
+export type UserEmailRegistrationInitiatePayload = {
+  readonly __typename: "UserEmailRegistrationInitiatePayload"
+  readonly emailRegistrationId?: Maybe<Scalars["EmailRegistrationId"]>
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
+}
+
+export type UserEmailRegistrationValidateInput = {
+  readonly code: Scalars["OneTimeAuthCode"]
+  readonly emailRegistrationId: Scalars["EmailRegistrationId"]
+}
+
+export type UserEmailRegistrationValidatePayload = {
+  readonly __typename: "UserEmailRegistrationValidatePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
+}
+
 export type UserLoginInput = {
   readonly code: Scalars["OneTimeAuthCode"]
   readonly phone: Scalars["Phone"]
@@ -1406,7 +1574,29 @@ export type UserLoginUpgradeInput = {
 }
 
 export type UserLogoutInput = {
-  readonly authToken: Scalars["AuthToken"]
+  readonly deviceToken: Scalars["String"]
+}
+
+export type UserPhoneDeletePayload = {
+  readonly __typename: "UserPhoneDeletePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
+}
+
+export type UserPhoneRegistrationInitiateInput = {
+  readonly channel?: InputMaybe<PhoneCodeChannelType>
+  readonly phone: Scalars["Phone"]
+}
+
+export type UserPhoneRegistrationValidateInput = {
+  readonly code: Scalars["OneTimeAuthCode"]
+  readonly phone: Scalars["Phone"]
+}
+
+export type UserPhoneRegistrationValidatePayload = {
+  readonly __typename: "UserPhoneRegistrationValidatePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
 }
 
 export type UserQuizQuestion = {
@@ -1425,9 +1615,37 @@ export type UserQuizQuestionUpdateCompletedPayload = {
   readonly userQuizQuestion?: Maybe<UserQuizQuestion>
 }
 
-export type UserRequestAuthCodeInput = {
-  readonly channel?: InputMaybe<PhoneCodeChannelType>
-  readonly phone: Scalars["Phone"]
+export type UserTotpDeleteInput = {
+  readonly authToken: Scalars["AuthToken"]
+}
+
+export type UserTotpDeletePayload = {
+  readonly __typename: "UserTotpDeletePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
+}
+
+export type UserTotpRegistrationInitiateInput = {
+  readonly authToken: Scalars["AuthToken"]
+}
+
+export type UserTotpRegistrationInitiatePayload = {
+  readonly __typename: "UserTotpRegistrationInitiatePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly totpRegistrationId?: Maybe<Scalars["TotpRegistrationId"]>
+  readonly totpSecret?: Maybe<Scalars["TotpSecret"]>
+}
+
+export type UserTotpRegistrationValidateInput = {
+  readonly authToken: Scalars["AuthToken"]
+  readonly totpCode: Scalars["TotpCode"]
+  readonly totpRegistrationId: Scalars["TotpRegistrationId"]
+}
+
+export type UserTotpRegistrationValidatePayload = {
+  readonly __typename: "UserTotpRegistrationValidatePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly me?: Maybe<User>
 }
 
 export type UserUpdate =
@@ -1462,6 +1680,7 @@ export type Wallet = {
   readonly accountId: Scalars["ID"]
   readonly balance: Scalars["SignedAmount"]
   readonly id: Scalars["ID"]
+  readonly lnurlp?: Maybe<Scalars["Lnurl"]>
   readonly pendingIncomingBalance: Scalars["SignedAmount"]
   /**
    * Transactions are ordered anti-chronologically,
@@ -1693,28 +1912,7 @@ export type AccountDefaultWalletQuery = {
     readonly __typename: "PublicWallet"
     readonly id: string
     readonly walletCurrency: WalletCurrency
-  }
-}
-
-export type LnInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
-  walletId: Scalars["WalletId"]
-  amount: Scalars["SatAmount"]
-  descriptionHash: Scalars["Hex32Bytes"]
-}>
-
-export type LnInvoiceCreateOnBehalfOfRecipientMutation = {
-  readonly __typename: "Mutation"
-  readonly mutationData: {
-    readonly __typename: "LnInvoicePayload"
-    readonly errors: ReadonlyArray<{
-      readonly __typename: "GraphQLApplicationError"
-      readonly message: string
-    }>
-    readonly invoice?: {
-      readonly __typename: "LnInvoice"
-      readonly paymentRequest: string
-      readonly paymentHash: string
-    } | null
+    readonly lnurlp?: string | null
   }
 }
 
@@ -2275,6 +2473,7 @@ export const AccountDefaultWalletDocument = gql`
       __typename
       id
       walletCurrency
+      lnurlp
     }
   }
 `
@@ -2330,75 +2529,6 @@ export type AccountDefaultWalletQueryResult = Apollo.QueryResult<
   AccountDefaultWalletQuery,
   AccountDefaultWalletQueryVariables
 >
-export const LnInvoiceCreateOnBehalfOfRecipientDocument = gql`
-  mutation lnInvoiceCreateOnBehalfOfRecipient(
-    $walletId: WalletId!
-    $amount: SatAmount!
-    $descriptionHash: Hex32Bytes!
-  ) {
-    mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: {
-        recipientWalletId: $walletId
-        amount: $amount
-        descriptionHash: $descriptionHash
-      }
-    ) {
-      errors {
-        message
-      }
-      invoice {
-        paymentRequest
-        paymentHash
-      }
-    }
-  }
-`
-export type LnInvoiceCreateOnBehalfOfRecipientMutationFn = Apollo.MutationFunction<
-  LnInvoiceCreateOnBehalfOfRecipientMutation,
-  LnInvoiceCreateOnBehalfOfRecipientMutationVariables
->
-
-/**
- * __useLnInvoiceCreateOnBehalfOfRecipientMutation__
- *
- * To run a mutation, you first call `useLnInvoiceCreateOnBehalfOfRecipientMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLnInvoiceCreateOnBehalfOfRecipientMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [lnInvoiceCreateOnBehalfOfRecipientMutation, { data, loading, error }] = useLnInvoiceCreateOnBehalfOfRecipientMutation({
- *   variables: {
- *      walletId: // value for 'walletId'
- *      amount: // value for 'amount'
- *      descriptionHash: // value for 'descriptionHash'
- *   },
- * });
- */
-export function useLnInvoiceCreateOnBehalfOfRecipientMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LnInvoiceCreateOnBehalfOfRecipientMutation,
-    LnInvoiceCreateOnBehalfOfRecipientMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<
-    LnInvoiceCreateOnBehalfOfRecipientMutation,
-    LnInvoiceCreateOnBehalfOfRecipientMutationVariables
-  >(LnInvoiceCreateOnBehalfOfRecipientDocument, options)
-}
-export type LnInvoiceCreateOnBehalfOfRecipientMutationHookResult = ReturnType<
-  typeof useLnInvoiceCreateOnBehalfOfRecipientMutation
->
-export type LnInvoiceCreateOnBehalfOfRecipientMutationResult =
-  Apollo.MutationResult<LnInvoiceCreateOnBehalfOfRecipientMutation>
-export type LnInvoiceCreateOnBehalfOfRecipientMutationOptions =
-  Apollo.BaseMutationOptions<
-    LnInvoiceCreateOnBehalfOfRecipientMutation,
-    LnInvoiceCreateOnBehalfOfRecipientMutationVariables
-  >
 export const NodeIdsDocument = gql`
   query nodeIds {
     globals {
