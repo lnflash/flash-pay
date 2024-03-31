@@ -101,7 +101,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
   const accountUsername = username ? username.toString() : ""
 
-  console.log(`accountUsername = ${accountUsername}`)
   const lnurl = await getLnurl(accountUsername, req)
   if (!lnurl) {
     return res.json({
@@ -121,7 +120,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     callback: details.callback,
     maxSendable: details.max,
     minSendable: details.min,
-    metadata: details.metadata,
+    metadata: JSON.stringify(details.metadata),
     tag: "payRequest",
     domain: details.domain,
     description: details.description,
