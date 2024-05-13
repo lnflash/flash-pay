@@ -351,6 +351,22 @@
   animation: spinKeyFrame 1s infinite linear;
 }
 
+.secondaryBtn {
+  background: var(--linear-gradient);
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  outline: none;
+  padding: 0.9em 3em;
+  border-radius: 10em;
+  gap: 0.5em;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
 @keyframes spinKeyFrame {
   to {
     transform: rotate(360deg);
