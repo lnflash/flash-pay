@@ -18,6 +18,7 @@ import styles from "./parse-payment.module.css"
 import { safeAmount } from "../../utils/utils"
 import { decodeInvoiceString } from "@galoymoney/client"
 import moment from "moment"
+import NFCComponent from "./nfc"
 
 interface Props {
   recipientWalletCurrency?: string
@@ -267,6 +268,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         </div>
       )}
       <div>
+        <NFCComponent paymentRequest={invoice?.paymentRequest} />
         {data ? (
           <>
             <div
