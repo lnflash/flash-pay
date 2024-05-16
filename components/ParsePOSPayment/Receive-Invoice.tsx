@@ -16,6 +16,8 @@ import PaymentOutcome from "../PaymentOutcome"
 import { Share } from "../Share"
 import styles from "./parse-payment.module.css"
 import { safeAmount } from "../../utils/utils"
+import { decodeInvoiceString } from "@galoymoney/client"
+import moment from "moment"
 
 interface Props {
   recipientWalletCurrency?: string
@@ -37,6 +39,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
   const [progress, setProgress] = React.useState(PROGRESS_BAR_MAX_WIDTH)
   const [seconds, setSeconds] = React.useState(0)
   const [minutes, setMinutes] = React.useState(USD_MAX_INVOICE_TIME)
+  const [expiresAt, setExpiresAt] = React.useState(USD_MAX_INVOICE_TIME)
 
   const [expiredInvoiceError, setExpiredInvoiceError] = React.useState<string>("")
   const [copied, setCopied] = React.useState<boolean>(false)
@@ -206,6 +209,20 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
     }
   }
 
+  React.useEffect(() => {
+    if (invoice) {
+      const dateString = decodeInvoiceString(
+        invoice?.paymentRequest,
+        "mainnet",
+      ).timeExpireDateString
+      if (dateString) {
+        setExpiresAt(
+          Number(moment(dateString).fromNow(true).split(" ")[0]) || USD_MAX_INVOICE_TIME,
+        )
+      }
+    }
+  }, [invoice])
+
   const copyInvoice = () => {
     if (!invoice?.paymentRequest) {
       return
@@ -246,7 +263,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
           <div className={styles.timer}>
             <span style={progressBarStyle}></span>
           </div>
-          <p>{`${USD_MAX_INVOICE_TIME}:00`}</p>
+          <p>{`${expiresAt}:00`}</p>
         </div>
       )}
       <div>
