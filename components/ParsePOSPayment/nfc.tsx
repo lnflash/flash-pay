@@ -243,10 +243,10 @@ function NFCComponent({ paymentRequest }: Props) {
             disabled={hasNFCPermission || !isNfcSupported}
           >
             {!isNfcSupported
-              ? "Bold card not supported"
+              ? "Flashcard not supported on this device"
               : hasNFCPermission
-              ? "Boltcard activated"
-              : "Activate boltcard"}
+              ? "Flashcard activated"
+              : "Activate Flashcard Tap to Pay"}
           </button>
         </div>
       )}
