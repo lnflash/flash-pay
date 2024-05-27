@@ -6,6 +6,7 @@ import { Image, OverlayTrigger, Tooltip } from "react-bootstrap"
 
 import { URL_HOST_DOMAIN } from "../../config/config"
 import styles from "./app-layout.module.css"
+import NFCComponent from "../ParsePOSPayment/nfc"
 
 type Props = {
   children: React.ReactPortal | React.ReactNode
@@ -126,6 +127,7 @@ const AppLayout = ({ children, username }: Props) => {
                 Share
               </button>
             </div>
+            <NFCComponent />
           </div>
         </ul>
       </nav>
