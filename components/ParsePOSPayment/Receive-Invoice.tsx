@@ -192,7 +192,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
     isDesktopType()
   }, [isDesktopType, isMobileDevice])
 
-  const errorString: string | null = errorsMessage || null
+  let errorString: string | null = errorsMessage || null
   let invoice: LnInvoiceObject | undefined
 
   if (data) {
@@ -200,12 +200,16 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
       const { lnInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
       if (invoiceData.invoice) {
         invoice = invoiceData.invoice
+      } else if (invoiceData.errors.length > 0) {
+        errorString = invoiceData.errors[0].message || "Account is inactive."
       }
     }
     if ("lnUsdInvoiceCreateOnBehalfOfRecipient" in data) {
       const { lnUsdInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
       if (invoiceData.invoice) {
         invoice = invoiceData.invoice
+      } else if (invoiceData.errors.length > 0) {
+        errorString = invoiceData.errors[0].message || "Account is inactive."
       }
     }
   }
@@ -242,6 +246,11 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         : expiredInvoiceError ?? null
     return (
       <div className={styles.error}>
+        <Image
+          src="/icons/cancel-icon.svg"
+          style={{ height: 150, width: 150, marginBottom: 20 }}
+        />
+
         <p>{errorString}</p>
         <p>{invalidInvoiceError}</p>
       </div>

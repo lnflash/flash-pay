@@ -306,7 +306,7 @@
 
 .error {
   flex-direction: column;
-  padding: 15% 1rem;
+  padding: 10% 1rem;
 }
 
 .error > p {
