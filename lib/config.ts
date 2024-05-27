@@ -29,9 +29,9 @@ if (!GRAPHQL_HOSTNAME) {
   }
 }
 
-const GRAPHQL_URI = `https://${GRAPHQL_HOSTNAME}/graphql`
-const GRAPHQL_SUBSCRIPTION_URI = GRAPHQL_WEBSOCKET_URL
-
+const GRAPHQL_URI = `http://localhost:4002/graphql`
+const GRAPHQL_SUBSCRIPTION_URI = `ws://localhost:4000/graphql`
 const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY as string
 
+console.log("Environment configs: " + JSON.stringify({ GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY }))
 export { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY }
