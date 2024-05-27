@@ -44,7 +44,7 @@ function NFCComponent({ paymentRequest }: Props) {
   const activateNfcScan = async () => {
     await handleNFCScan()
     alert(
-      "Boltcard is now active. There will be no need to activate it again. Please tap your card to redeem the payment",
+      "Flashcard is now active. There will be no need to activate it again. Please tap your card to redeem the payment",
     )
   }
 
@@ -129,13 +129,14 @@ function NFCComponent({ paymentRequest }: Props) {
   }, [hasNFCPermission])
 
   React.useEffect(() => {
+    console.log("Payment request>>>>>>>", paymentRequest)
     ;(async () => {
       if (!nfcMessage) {
         return
       }
 
       if (!nfcMessage.toLowerCase().includes("lnurl")) {
-        alert("Not a compatible boltcard")
+        alert("Not a compatible flashcard")
         return
       }
 
