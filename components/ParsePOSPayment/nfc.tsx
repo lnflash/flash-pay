@@ -129,11 +129,12 @@ function NFCComponent({ paymentRequest }: Props) {
   }, [hasNFCPermission])
 
   React.useEffect(() => {
-    console.log("Payment request>>>>>>>", paymentRequest)
+    console.log("Payment request>>>>>>>1", paymentRequest)
     ;(async () => {
       if (!nfcMessage) {
         return
       }
+      console.log("Payment request>>>>>>>2", paymentRequest)
 
       if (!nfcMessage.toLowerCase().includes("lnurl")) {
         alert("Not a compatible flashcard")
