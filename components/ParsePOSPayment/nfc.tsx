@@ -129,84 +129,81 @@ function NFCComponent({ paymentRequest }: Props) {
   }, [hasNFCPermission])
 
   React.useEffect(() => {
-    console.log("Payment request>>>>>>>1", paymentRequest)
-    ;(async () => {
-      if (!nfcMessage) {
-        return
-      }
-      console.log("Payment request>>>>>>>2", paymentRequest)
-
-      if (!nfcMessage.toLowerCase().includes("lnurl")) {
-        alert("Not a compatible flashcard")
-        return
-      }
-
-      if (!paymentRequest) {
-        alert("add an amount and create an invoice before scanning the card")
-        return
-      }
-
-      const sound = new Audio("/payment-sound.mp3")
-      sound
-        .play()
-        .then(() => {
-          console.log("Playback started successfully")
-        })
-        .catch((error) => {
-          console.error("Playback failed", error)
-        })
-
-      setIsLoading(true)
-      const lnurlParams = await getParams(nfcMessage)
-
-      if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
-        alert(
-          `not a properly configured lnurl withdraw tag\n\n${nfcMessage}\n\n${
-            "reason" in lnurlParams && lnurlParams.reason
-          }`,
-        )
-        setIsLoading(false)
-        return
-      }
-
-      const { callback, k1 } = lnurlParams
-
-      const urlObject = new URL(callback)
-      const searchParams = urlObject.searchParams
-      searchParams.set("k1", k1)
-      searchParams.set("pr", paymentRequest)
-
-      const url = urlObject.toString()
-
-      const result = await fetch(url)
-      if (result.ok) {
-        const lnurlResponse = await result.json()
-        if (lnurlResponse?.status?.toLowerCase() !== "ok") {
-          console.error(lnurlResponse, "error with redeeming")
-        }
-
-        console.log("payment successful")
-      } else {
-        let errorMessage = ""
-        try {
-          const decoded = await result.json()
-          if (decoded.reason) {
-            errorMessage += decoded.reason
-          }
-          if (decoded.message) {
-            errorMessage += decoded.message
-          }
-        } finally {
-          let message = `Error processing payment.\n\nHTTP error code: ${result.status}`
-          if (errorMessage) {
-            message += `\n\nError message: ${errorMessage}`
-          }
-          alert(message)
-        }
-      }
-      setIsLoading(false)
-    })()
+    if (!!nfcMessage && !!paymentRequest) nfcHandler()
   }, [nfcMessage, paymentRequest])
+
+  const nfcHandler = async () => {
+    if (!nfcMessage.toLowerCase().includes("lnurl")) {
+      alert("Not a compatible flashcard")
+      return
+    }
+
+    if (!paymentRequest) {
+      alert("add an amount and create an invoice before scanning the card")
+      return
+    }
+
+    const sound = new Audio("/payment-sound.mp3")
+    sound
+      .play()
+      .then(() => {
+        console.log("Playback started successfully")
+      })
+      .catch((error) => {
+        console.error("Playback failed", error)
+      })
+
+    setIsLoading(true)
+    const lnurlParams = await getParams(nfcMessage)
+
+    console.log("LNURL PARAMS >>>>>>>>>>>>>>>>??????????", lnurlParams)
+    if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
+      alert(
+        `not a properly configured lnurl withdraw tag\n\n${nfcMessage}\n\n${
+          "reason" in lnurlParams && lnurlParams.reason
+        }`,
+      )
+      setIsLoading(false)
+      return
+    }
+
+    const { callback, k1 } = lnurlParams
+
+    const urlObject = new URL(callback)
+    const searchParams = urlObject.searchParams
+    searchParams.set("k1", k1)
+    searchParams.set("pr", paymentRequest)
+
+    const url = urlObject.toString()
+
+    const result = await fetch(url)
+    if (result.ok) {
+      const lnurlResponse = await result.json()
+      if (lnurlResponse?.status?.toLowerCase() !== "ok") {
+        console.error(lnurlResponse, "error with redeeming")
+      }
+
+      console.log("payment successful")
+    } else {
+      let errorMessage = ""
+      try {
+        const decoded = await result.json()
+        if (decoded.reason) {
+          errorMessage += decoded.reason
+        }
+        if (decoded.message) {
+          errorMessage += decoded.message
+        }
+      } finally {
+        let message = `Error processing payment.\n\nHTTP error code: ${result.status}`
+        if (errorMessage) {
+          message += `\n\nError message: ${errorMessage}`
+        }
+        alert(message)
+      }
+    }
+    setIsLoading(false)
+  }
 
   if (isLoading) {
     return (
