@@ -18,7 +18,7 @@ export default function CurrencyDropdown({
   const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState(
     router.query.display && typeof router.query.display === "string"
       ? router.query.display
-      : localStorage.getItem("display") ?? "USD",
+      : localStorage.getItem("display") ?? "JMD",
   )
   const [isDropDownOpen, setIsDropDownOpen] = React.useState(false)
 
