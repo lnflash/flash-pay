@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { getParams } from "js-lnurl"
-import { requestPayServiceParams } from "lnurl-pay"
+import { requestPayServiceParams, utils } from "lnurl-pay"
 
 import LoadingComponent from "../loading"
 
@@ -162,6 +162,9 @@ function NFCComponent({ paymentRequest }: Props) {
     const params = await requestPayServiceParams({
       lnUrlOrAddress: nfcMessage,
     })
+    const util = utils.decodeUrlOrAddress(nfcMessage)
+
+    console.log("utils >>>>>>>>>>>>>>>>??????????", util)
     console.log("requestPayServiceParams >>>>>>>>>>>>>>>>??????????", params)
     // <<<<<<<<<<<
     console.log("LNURL PARAMS >>>>>>>>>>>>>>>>??????????", lnurlParams)
