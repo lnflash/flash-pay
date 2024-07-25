@@ -339,7 +339,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         )}
       </div>
 
-      <Memo state={state} dispatch={dispatch} />
+      {(!state.createdInvoice || state.memo) && (
+        <Memo state={state} dispatch={dispatch} />
+      )}
 
       {state.createdInvoice ? (
         <ReceiveInvoice
@@ -400,12 +402,14 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           }}
         >
           <Image
-            src={"/icons/lightning-icon.svg"}
+            src={
+              state.createdInvoice ? "/icons/caret-left.svg" : "/icons/lightning-icon.svg"
+            }
             alt="lightning icon"
             width="20"
             height="20"
           />
-          {state.createdInvoice ? "Create new invoice" : "Create invoice"}
+          {state.createdInvoice ? "Back" : "Create invoice"}
         </button>
         {!state.createdInvoice && (
           <button

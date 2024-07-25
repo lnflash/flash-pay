@@ -128,7 +128,7 @@ export default function ({
         </Row>
         <br />
       </Container>
-      <Row className="justify-content-center">
+      <Row className="justify-content-center" style={{ width: "100vw", margin: 0 }}>
         <ReactToPrint
           trigger={() => <button className="print-paycode-button">Print QR Code</button>}
           content={() => componentRef.current}

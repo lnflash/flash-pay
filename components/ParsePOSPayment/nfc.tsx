@@ -245,7 +245,7 @@ function NFCComponent({ paymentRequest }: Props) {
             disabled={hasNFCPermission || !isNfcSupported}
           >
             {!isNfcSupported
-              ? "Flashcard not supported on this device"
+              ? "Flashcard not supported"
               : hasNFCPermission
               ? "Flashcard activated"
               : "Activate Flashcard Tap to Pay"}

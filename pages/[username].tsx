@@ -12,6 +12,7 @@ import Head from "next/head"
 import CurrencyDropdown from "../components/Currency/currency-dropdown"
 import { gql } from "@apollo/client"
 import { useAccountDefaultWalletsQuery } from "../lib/graphql/generated"
+import LoadingComponent from "../components/loading"
 
 gql`
   query accountDefaultWallets($username: Username!) {
@@ -50,7 +51,11 @@ function ReceivePayment() {
     manifestParams.set("memo", memo.toString())
   }
 
-  const { data, error: usernameError } = useAccountDefaultWalletsQuery({
+  const {
+    data,
+    error: usernameError,
+    loading,
+  } = useAccountDefaultWalletsQuery({
     variables: { username: accountUsername },
   })
 
@@ -82,13 +87,27 @@ function ReceivePayment() {
           id="manifest"
         />
       </Head>
-      {usernameError ? (
+      {loading ? (
+        <LoadingComponent />
+      ) : usernameError ? (
         <div className={styles.error}>
           <p>{`${usernameError.message}.`}</p>
           <p>Please check the username in your browser URL and try again.</p>
-          <Link href={"/setuppwa"}>
-            <a onClick={() => localStorage.removeItem("username")}>Back</a>
-          </Link>
+          <button
+            data-testid="nfc-btn"
+            className={styles.secondaryBtn}
+            style={{
+              borderRadius: "0.5em",
+              padding: "0.4rem",
+              fontWeight: "normal",
+            }}
+            onClick={() => {
+              localStorage.removeItem("username")
+              router.replace("/")
+            }}
+          >
+            Go back
+          </button>
         </div>
       ) : (
         <>
