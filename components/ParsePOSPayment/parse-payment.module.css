@@ -365,6 +365,7 @@
   gap: 0.5em;
   cursor: pointer;
   margin-top: 1rem;
+  width: calc(100% - 1rem);
 }
 
 @keyframes spinKeyFrame {
