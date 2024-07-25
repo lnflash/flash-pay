@@ -135,17 +135,6 @@ const AppLayout = ({ children, username }: Props) => {
       <main className={`${openSideBar && styles.main_bg} ${styles.main}`}>
         {children}
       </main>
-      <div className={styles.footer}>
-        <a href="https://getflash.io" target="_blank" rel="noreferrer">
-          <span>Powered by</span>
-          <Image
-            src="/icons/flash-logo-text-icon.svg"
-            alt="flash-logo"
-            width={50}
-            height={50}
-          />
-        </a>
-      </div>
     </div>
   )
 }
