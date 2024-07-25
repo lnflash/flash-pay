@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { getParams } from "js-lnurl"
+import { requestPayServiceParams } from "lnurl-pay"
 
 import LoadingComponent from "../loading"
 
@@ -155,7 +156,14 @@ function NFCComponent({ paymentRequest }: Props) {
 
     setIsLoading(true)
     const lnurlParams = await getParams(nfcMessage)
+    console.log("NFC MESSAGE>>>>>>>>>", nfcMessage)
 
+    // >>>>>>>>>>
+    const params = await requestPayServiceParams({
+      lnUrlOrAddress: nfcMessage,
+    })
+    console.log("requestPayServiceParams >>>>>>>>>>>>>>>>??????????", params)
+    // <<<<<<<<<<<
     console.log("LNURL PARAMS >>>>>>>>>>>>>>>>??????????", lnurlParams)
     if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
       alert(
