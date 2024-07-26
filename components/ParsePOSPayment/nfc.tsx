@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react"
 import { getParams } from "js-lnurl"
-import { requestPayServiceParams, utils } from "lnurl-pay"
+import {
+  parsePaymentDestination,
+  Network as NetworkGaloyClient,
+} from "@galoymoney/client"
 
 import LoadingComponent from "../loading"
 
@@ -159,14 +162,15 @@ function NFCComponent({ paymentRequest }: Props) {
     console.log("NFC MESSAGE>>>>>>>>>", nfcMessage)
 
     // >>>>>>>>>>
-    const params = await requestPayServiceParams({
-      lnUrlOrAddress: nfcMessage,
+    const parsedDestination = parsePaymentDestination({
+      destination: nfcMessage,
+      network: "mainnet" as NetworkGaloyClient, // hard coded to mainnet
+      lnAddressDomains: ["lnflash.me", "pay.lnflash.me", "flashapp.me"],
     })
-    const util = utils.decodeUrlOrAddress(nfcMessage)
 
-    console.log("utils >>>>>>>>>>>>>>>>??????????", util)
-    console.log("requestPayServiceParams >>>>>>>>>>>>>>>>??????????", params)
+    console.log("GALOY PARSE PAYMENT DESTINATION>>>>", parsedDestination)
     // <<<<<<<<<<<
+
     console.log("LNURL PARAMS >>>>>>>>>>>>>>>>??????????", lnurlParams)
     if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
       alert(
