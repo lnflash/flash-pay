@@ -192,17 +192,18 @@ function NFCComponent({ paymentRequest }: Props) {
     const url = urlObject.toString()
 
     const result = await fetch(url)
+    const lnurlResponse = await result.json()
+
     if (result.ok) {
-      const lnurlResponse = await result.json()
-      if (
-        (lnurlResponse.reason && lnurlResponse.reason.includes("not within bounds")) ||
-        lnurlResponse.reason.includes("Amount is bigger than the maximum")
-      ) {
-        alert("Payment Failed: Insufficient Funds")
-      } else if (lnurlResponse?.status?.toLowerCase() !== "ok") {
+      if (lnurlResponse?.status?.toLowerCase() !== "ok") {
         console.error(lnurlResponse, "error with redeeming")
-        alert(lnurlResponse.reason)
+        alert(lnurlResponse.reason || "Something went wrong. Please, try again later")
       }
+    } else if (
+      (lnurlResponse.reason && lnurlResponse.reason.includes("not within bounds")) ||
+      lnurlResponse.reason.includes("Amount is bigger than the maximum")
+    ) {
+      alert("Payment Failed: Insufficient Funds")
     } else {
       let errorMessage = ""
       try {
