@@ -16,6 +16,9 @@ import PaymentOutcome from "../PaymentOutcome"
 import { Share } from "../Share"
 import styles from "./parse-payment.module.css"
 import { safeAmount } from "../../utils/utils"
+import { decodeInvoiceString } from "@galoymoney/client"
+import moment from "moment"
+import NFCComponent from "./nfc"
 
 interface Props {
   recipientWalletCurrency?: string
@@ -37,6 +40,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
   const [progress, setProgress] = React.useState(PROGRESS_BAR_MAX_WIDTH)
   const [seconds, setSeconds] = React.useState(0)
   const [minutes, setMinutes] = React.useState(USD_MAX_INVOICE_TIME)
+  const [expiresAt, setExpiresAt] = React.useState(USD_MAX_INVOICE_TIME)
 
   const [expiredInvoiceError, setExpiredInvoiceError] = React.useState<string>("")
   const [copied, setCopied] = React.useState<boolean>(false)
@@ -188,7 +192,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
     isDesktopType()
   }, [isDesktopType, isMobileDevice])
 
-  const errorString: string | null = errorsMessage || null
+  let errorString: string | null = errorsMessage || null
   let invoice: LnInvoiceObject | undefined
 
   if (data) {
@@ -196,15 +200,33 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
       const { lnInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
       if (invoiceData.invoice) {
         invoice = invoiceData.invoice
+      } else if (invoiceData.errors.length > 0) {
+        errorString = invoiceData.errors[0].message || "Account is inactive."
       }
     }
     if ("lnUsdInvoiceCreateOnBehalfOfRecipient" in data) {
       const { lnUsdInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
       if (invoiceData.invoice) {
         invoice = invoiceData.invoice
+      } else if (invoiceData.errors.length > 0) {
+        errorString = invoiceData.errors[0].message || "Account is inactive."
       }
     }
   }
+
+  React.useEffect(() => {
+    if (invoice) {
+      const dateString = decodeInvoiceString(
+        invoice?.paymentRequest,
+        "mainnet",
+      ).timeExpireDateString
+      if (dateString) {
+        setExpiresAt(
+          Number(moment(dateString).fromNow(true).split(" ")[0]) || USD_MAX_INVOICE_TIME,
+        )
+      }
+    }
+  }, [invoice])
 
   const copyInvoice = () => {
     if (!invoice?.paymentRequest) {
@@ -224,6 +246,11 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         : expiredInvoiceError ?? null
     return (
       <div className={styles.error}>
+        <Image
+          src="/icons/cancel-icon.svg"
+          style={{ height: 150, width: 150, marginBottom: 20 }}
+        />
+
         <p>{errorString}</p>
         <p>{invalidInvoiceError}</p>
       </div>
@@ -246,10 +273,11 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
           <div className={styles.timer}>
             <span style={progressBarStyle}></span>
           </div>
-          <p>{`${USD_MAX_INVOICE_TIME}:00`}</p>
+          <p>{`${expiresAt}:00`}</p>
         </div>
       )}
       <div>
+        <NFCComponent paymentRequest={invoice?.paymentRequest} />
         {data ? (
           <>
             <div

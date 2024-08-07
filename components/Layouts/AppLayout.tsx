@@ -6,6 +6,7 @@ import { Image, OverlayTrigger, Tooltip } from "react-bootstrap"
 
 import { URL_HOST_DOMAIN } from "../../config/config"
 import styles from "./app-layout.module.css"
+import NFCComponent from "../ParsePOSPayment/nfc"
 
 type Props = {
   children: React.ReactPortal | React.ReactNode
@@ -69,7 +70,7 @@ const AppLayout = ({ children, username }: Props) => {
               <Image src="/at-black&white.svg" width={"15"} height={"15"} />
               <div>
                 <p>Lightning address:</p>
-                <p>{lightningAddr}</p>
+                <p style={{ fontWeight: 400 }}>{lightningAddr}</p>
               </div>
             </div>
             <div>
@@ -127,22 +128,12 @@ const AppLayout = ({ children, username }: Props) => {
               </button>
             </div>
           </div>
+          <NFCComponent />
         </ul>
       </nav>
       <div className={styles.divider}></div>
       <main className={`${openSideBar && styles.main_bg} ${styles.main}`}>
         {children}
-        <div className={styles.footer}>
-          <a href="https://getflash.io" target="_blank" rel="noreferrer">
-            <span>Powered by</span>
-            <Image
-              src="/icons/flash-logo-text-icon.svg"
-              alt="flash-logo"
-              width={50}
-              height={50}
-            />
-          </a>
-        </div>
       </main>
     </div>
   )

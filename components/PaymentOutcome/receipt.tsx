@@ -22,7 +22,8 @@ function receipt(props: Props) {
 
       <div className="text-center">
         <span>Transaction Amount</span>
-        <h1>{localStorage.getItem("formattedSatsValue")}</h1>
+        <h1>{localStorage.getItem("display")}</h1>
+        <h3>{localStorage.getItem("formattedSatsValue")}</h3>
         <span> ~ {localStorage.getItem("formattedFiatValue")}</span>
 
         <div className="d-flex justify-content-center">
@@ -39,15 +40,6 @@ function receipt(props: Props) {
             </tr>
 
             <tr>
-              <td className="py-5 border-bottom">
-                Transaction Reference <br /> (Invoice)
-              </td>
-              <td className="py-5 border-bottom">
-                <div className={styles.reference}>{props.paymentRequest}</div>
-              </td>
-            </tr>
-
-            <tr>
               <td className="py-3 border-bottom">Status</td>
               <td className="py-3 border-bottom">Paid</td>
             </tr>
@@ -58,15 +50,6 @@ function receipt(props: Props) {
             </tr>
           </table>
         </div>
-        <a
-          className={styles.link}
-          href="https://getflash.io"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {" "}
-          Powered by <GaloyIcon />
-        </a>
       </div>
     </div>
   )

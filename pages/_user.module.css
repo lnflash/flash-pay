@@ -59,9 +59,26 @@
   display: grid;
   padding: 0 1rem;
   place-content: center;
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 60px);
 }
 
 .error > p:last-child {
   color: rgb(45, 43, 43);
+}
+
+.secondaryBtn {
+  background: var(--linear-gradient);
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  outline: none;
+  padding: 0.9em 3em;
+  border-radius: 10em;
+  gap: 0.5em;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: calc(100% - 1rem);
 }
