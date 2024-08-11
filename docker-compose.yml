@@ -1,8 +1,8 @@
 version: "3.9"
 services:
   pay:
-    image: galoy-pay
+    image: flash-pay
     environment:
-      - NEXT_PUBLIC_GRAPHQL_HOSTNAME=api.staging.galoy.io
+      - NEXT_PUBLIC_GRAPHQL_HOSTNAME=api.test.flashapp.me
     ports:
       - "3000:3000"
