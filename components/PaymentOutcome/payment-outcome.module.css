@@ -92,9 +92,53 @@
   text-decoration: none;
 }
 
-/* make the receipt hidden on render but still accessible in the DOM */
+/* Make the receipt hidden on render but still accessible in the DOM */
 .hideReceipt {
   position: absolute;
   left: -9999px;
   visibility: hidden;
+}
+
+@media print {
+  .printReceipt {
+    font-size: 2em; /* Slightly larger base font size for small paper */
+  }
+
+  .fontLarge {
+    font-size: 4em; /* Adjusted for smaller paper */
+  }
+
+  .fontXlarge {
+    font-size: 5em; /* Extra large font for headings on smaller paper */
+  }
+
+  .fontMedium {
+    font-size: 3em; /* Medium font for table data, suitable for 58mm */
+  }
+
+  .printTable {
+    width: 100%; /* Use full width of small paper */
+    border-collapse: collapse; /* Ensure no gaps between table cells */
+  }
+
+  .printTable td {
+    padding: 0.5em; /* Adjust padding for table cells */
+  }
+
+  .printImage {
+    width: 150px; /* Smaller image size for 58mm paper */
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  /* Additional styles for print */
+  .container {
+    position: static; /* Reset position for print */
+    padding: 0; /* Remove padding for print */
+    background-color: transparent; /* Make background transparent */
+  }
+
+  .back_btn,
+  .pay_new_btn {
+    display: none; /* Hide buttons on print */
+  }
 }
