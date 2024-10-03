@@ -18,6 +18,8 @@ import { useDisplayCurrency } from "../../lib/use-display-currency"
 import { Currency } from "../../lib/graphql/generated"
 import { ParsedUrlQuery } from "querystring"
 import CurrencyInput, { formatValue } from "react-currency-input-field"
+import useSatPrice from "../../lib/use-sat-price"
+import toast, { Toaster } from "react-hot-toast"
 
 function isRunningStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -56,6 +58,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { display } = parseDisplayCurrency(router.query)
   const { currencyToSats, satsToCurrency, hasLoaded } = useRealtimePrice(display)
   const { currencyList } = useDisplayCurrency()
+  const { satsToUsd, usdToSats } = useSatPrice()
   const [valueInFiat, setValueInFiat] = React.useState(0)
   const [valueInSats, setValueInSats] = React.useState(0)
   const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
@@ -397,7 +400,20 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             if (state.createdInvoice) {
               dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
             } else {
-              dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
+              if (satsToUsd(valueInSats) < 0.01) {
+                const { convertedCurrencyAmount, formattedCurrency } = satsToCurrency(
+                  Math.ceil(usdToSats(0.01)),
+                  display,
+                  currencyMetadata.fractionDigits,
+                )
+                console.log("convertedCurrencyAmount>>>>>>", convertedCurrencyAmount)
+                console.log("formattedCurrency>>>>>>", formattedCurrency)
+                toast.error(
+                  "Amount must be at least " + Math.ceil(usdToSats(0.01)) + " sats",
+                )
+              } else {
+                dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
+              }
             }
           }}
         >
@@ -426,6 +442,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           </button>
         )}
       </div>
+      <Toaster />
     </Container>
   )
 }
