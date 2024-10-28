@@ -23,6 +23,7 @@ const AppLayout = ({ children, username }: Props) => {
 
   const cashRegisterLink = username ? `/${username}` : "#"
   const payCodeLink = username ? `/${username}/print?memo=${memo}` : "#"
+  const rewardsLink = username ? `/${username}/rewards?memo=${memo}` : "#"
 
   const copyToClipboard = () => {
     copy(lightningAddr)
@@ -46,9 +47,10 @@ const AppLayout = ({ children, username }: Props) => {
           <span className={`${openSideBar && styles.toggle}`}></span>
           <span className={`${openSideBar && styles.toggle}`}></span>
           <span className={`${openSideBar && styles.toggle}`}></span>
+          <span className={`${openSideBar && styles.toggle}`}></span>
         </div>
         <ul className={`${openSideBar && styles.nav_menu_bg} ${styles.nav_menu}`}>
-          <li>{`Ways to pay ${username ?? "user"} `}</li>
+          <li>{`Username: ${username ?? "user"} `}</li>
           <li onClick={closeSideBar}>
             <Link href={cashRegisterLink}>
               <a>
@@ -62,6 +64,14 @@ const AppLayout = ({ children, username }: Props) => {
               <a>
                 <Image src="/paycode-black&white.svg" width={"15"} height={"15"} />
                 Printable Paycode
+              </a>
+            </Link>
+          </li>
+          <li onClick={closeSideBar}>
+            <Link href={rewardsLink}>
+              <a>
+                <Image src="/rewards.jpg" width={"15"} height={"15"} />
+                Flashback Rewards
               </a>
             </Link>
           </li>
