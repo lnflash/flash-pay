@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container"
 import originalUrl from "original-url"
 import { bech32 } from "bech32"
 import { Image } from "react-bootstrap"
-import { useRef } from "react"
+import NFCPComponent from "../../components/ParsePOSPayment/nfcp"
 
 export async function getServerSideProps({
   req,
@@ -41,7 +41,9 @@ export async function getServerSideProps({
   }
 }
 
-export default function ({
+export default function NFCPage({
+  qrCodeURL,
+  username,
   userHeader,
 }: {
   lightningAddress: string
@@ -68,8 +70,10 @@ export default function ({
         </Row>
         <br />
       </Container>
+
       <Row className="justify-content-center" style={{ width: "100vw", margin: 0 }}>
-        <button className="print-paycode-button">Tap for Rewards</button>
+        <button className="print-paycode-button">Tap to Receive Rewards</button>
+        <NFCPComponent />
       </Row>
     </>
   )
