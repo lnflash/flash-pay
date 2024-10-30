@@ -2,6 +2,19 @@
   margin-top: 2rem;
 }
 
+.toggleButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4570e;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
 .output {
   display: flex;
   flex-direction: column;
