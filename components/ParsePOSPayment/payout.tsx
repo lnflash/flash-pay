@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { getParams } from "js-lnurl"
 import axios from "axios"
-import {
-  parsePaymentDestination,
-  Network as NetworkGaloyClient,
-} from "@galoymoney/client"
 
 import LoadingComponent from "../loading"
 import styles from "./parse-payment.module.css"
@@ -19,7 +15,7 @@ interface NFCRecord {
   encoding?: string
 }
 
-function NFCComponent({ paymentRequest }: Props) {
+function NFCPayoutComponent({ paymentRequest }: Props) {
   const [hasNFCPermission, setHasNFCPermission] = useState(false)
   const [nfcMessage, setNfcMessage] = useState("")
   const [isNfcSupported, setIsNfcSupported] = useState(false)
@@ -91,13 +87,15 @@ function NFCComponent({ paymentRequest }: Props) {
   }
 
   useEffect(() => {
-    if (lnurl && paymentRequest === "payout" && !hasRedeemed) {
+    if (lnurl && !hasRedeemed) {
       console.log("LNURL state updated:", lnurl)
       console.log("Begin redeeming rewards")
       redeemRewards(0.01) // TODO: convert to variable amount
       setHasRedeemed(true)
+      // return to the previous page
+      window.history.back()
     }
-  }, [lnurl, paymentRequest, hasRedeemed])
+  }, [lnurl, hasRedeemed])
 
   const extractLnurl = async (text: string) => {
     if (text.startsWith("lnurlw")) {
@@ -132,10 +130,7 @@ function NFCComponent({ paymentRequest }: Props) {
         const record = event.message.records[0]
         const text = decodeNDEFRecord(record)
 
-        if (paymentRequest === "payout") {
-          extractLnurl(text)
-          return
-        }
+        extractLnurl(text)
 
         setNfcMessage(text)
       }
@@ -186,90 +181,6 @@ function NFCComponent({ paymentRequest }: Props) {
     }
   }, [hasNFCPermission])
 
-  useEffect(() => {
-    if (!!nfcMessage && !!paymentRequest) nfcHandler()
-  }, [nfcMessage, paymentRequest])
-
-  useEffect(() => {
-    if (paymentRequest !== "payout") {
-      setHasRedeemed(false)
-      setLnurl(null)
-    }
-  }, [paymentRequest])
-
-  const nfcHandler = async () => {
-    if (!nfcMessage.toLowerCase().includes("lnurl")) {
-      alert("Not a compatible flashcard")
-      return
-    }
-
-    if (!paymentRequest) {
-      alert("Add an amount and create an invoice before scanning the card")
-      return
-    }
-
-    const sound = new Audio("/payment-sound.mp3")
-    sound
-      .play()
-      .then(() => {
-        console.log("Playback started successfully")
-      })
-      .catch((error) => {
-        console.error("Playback failed", error)
-      })
-
-    setIsLoading(true)
-    try {
-      const [lnurlParams, parsedDestination] = await Promise.all([
-        getParams(nfcMessage),
-        parsePaymentDestination({
-          destination: nfcMessage,
-          network: "mainnet" as NetworkGaloyClient,
-          lnAddressDomains: ["lnflash.me", "pay.lnflash.me", "flashapp.me"],
-        }),
-      ])
-
-      console.log("LNURL PARAMS:", lnurlParams)
-      console.log("PARSED DESTINATION:", parsedDestination)
-
-      if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
-        alert(`Not a properly configured lnurl withdraw tag`)
-        setIsLoading(false)
-        return
-      }
-
-      const { callback, k1 } = lnurlParams
-
-      if (!k1 || !paymentRequest) {
-        console.error("Missing k1 or paymentRequest for processing")
-        setIsLoading(false)
-        return
-      }
-
-      const url = new URL(callback)
-      url.searchParams.set("k1", k1)
-      url.searchParams.set("pr", paymentRequest)
-
-      console.log("Constructed URL for redeem:", url.toString())
-
-      const result = await fetch(url.toString())
-      const lnurlResponse = await result.json()
-
-      console.log("LNURL Response:", lnurlResponse)
-
-      if (result.ok && lnurlResponse?.status?.toLowerCase() === "ok") {
-        console.log("Payment successful")
-      } else {
-        const errorMessage =
-          lnurlResponse?.reason || "Something went wrong. Please, try again later"
-        alert(errorMessage)
-      }
-    } catch (error) {
-      console.error("Error processing NFC payment", error)
-    }
-    setIsLoading(false)
-  }
-
   if (isLoading) {
     return (
       <div
@@ -291,31 +202,7 @@ function NFCComponent({ paymentRequest }: Props) {
     )
   }
 
-  return (
-    <>
-      {paymentRequest === undefined && (
-        <div className="d-flex w-full">
-          <button
-            data-testid="nfc-btn"
-            className={styles.secondaryBtn}
-            style={{
-              borderRadius: "0.5em",
-              padding: "0.4rem",
-              fontWeight: "normal",
-            }}
-            onClick={activateNfcScan}
-            disabled={hasNFCPermission || !isNfcSupported}
-          >
-            {!isNfcSupported
-              ? "Flashcard not supported"
-              : hasNFCPermission
-              ? "Flashcard activated"
-              : "Activate Flashcard Tap to Pay"}
-          </button>
-        </div>
-      )}
-    </>
-  )
+  return <>{paymentRequest === undefined && <div className="d-flex w-full"></div>}</>
 }
 
-export default React.memo(NFCComponent)
+export default React.memo(NFCPayoutComponent)

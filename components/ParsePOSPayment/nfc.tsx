@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect } from "react"
 import { getParams } from "js-lnurl"
-import axios from "axios"
 import {
   parsePaymentDestination,
   Network as NetworkGaloyClient,
 } from "@galoymoney/client"
 
 import LoadingComponent from "../loading"
+
 import styles from "./parse-payment.module.css"
 
 type Props = {
@@ -24,8 +24,6 @@ function NFCComponent({ paymentRequest }: Props) {
   const [nfcMessage, setNfcMessage] = useState("")
   const [isNfcSupported, setIsNfcSupported] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [lnurl, setLnurl] = useState<string | null>(null)
-  const [hasRedeemed, setHasRedeemed] = useState(false)
 
   const decodeNDEFRecord = (record: NFCRecord) => {
     if (!record.data) {
@@ -45,64 +43,6 @@ function NFCComponent({ paymentRequest }: Props) {
 
     const decoder = new TextDecoder(record.encoding || "utf-8")
     return decoder.decode(buffer)
-  }
-
-  const handleSubmit = useCallback(async (payload: string) => {
-    try {
-      const payloadPart = payload.split("?")[1]
-      const domain = payload.split("/")[2]
-      const url = `https://${domain}/boltcards/balance?${payloadPart}`
-      const response = await axios.get(url)
-      const html = response.data
-      const lnurlMatch = html.match(/href="lightning:(lnurl\w+)"/)
-      if (lnurlMatch) {
-        setLnurlSafely(lnurlMatch[1])
-      }
-    } catch (error) {
-      console.error("HTTP Error", error)
-    }
-  }, [])
-
-  const setLnurlSafely = (value: string) => {
-    setLnurl((prev) => (prev !== value ? value : prev))
-  }
-
-  const redeemRewards = async (amount: number) => {
-    if (!lnurl) {
-      console.error("LNURL not set")
-      return
-    }
-    const pullPaymentId = process.env.NEXT_PUBLIC_PULL_PAYMENT_ID
-    const domain = process.env.NEXT_PUBLIC_BTCPAY_SERVER_URL
-
-    const requestBody = {
-      destination: lnurl,
-      amount: amount.toFixed(2),
-      paymentMethod: "BTC-LightningLike",
-    }
-
-    const url = `https://${domain}/api/v1/pull-payments/${pullPaymentId}/payouts`
-    try {
-      const response = await axios.post(url, requestBody)
-      console.log("Response from redeeming rewards", response)
-    } catch (error) {
-      console.error("Error redeeming rewards", error)
-    }
-  }
-
-  useEffect(() => {
-    if (lnurl && paymentRequest === "payout" && !hasRedeemed) {
-      console.log("LNURL state updated:", lnurl)
-      console.log("Begin redeeming rewards")
-      redeemRewards(0.01) // TODO: convert to variable amount
-      setHasRedeemed(true)
-    }
-  }, [lnurl, paymentRequest, hasRedeemed])
-
-  const extractLnurl = async (text: string) => {
-    if (text.startsWith("lnurlw")) {
-      await handleSubmit(text)
-    }
   }
 
   const activateNfcScan = async () => {
@@ -129,13 +69,10 @@ function NFCComponent({ paymentRequest }: Props) {
 
       ndef.onreading = (event) => {
         console.log("NFC tag read.")
+        console.log(event.message)
+
         const record = event.message.records[0]
         const text = decodeNDEFRecord(record)
-
-        if (paymentRequest === "payout") {
-          extractLnurl(text)
-          return
-        }
 
         setNfcMessage(text)
       }
@@ -175,27 +112,29 @@ function NFCComponent({ paymentRequest }: Props) {
       }
 
       result.onchange = () => {
-        setHasNFCPermission(result.state === "granted")
+        if (result.state === "granted") {
+          setHasNFCPermission(true)
+        } else {
+          setHasNFCPermission(false)
+        }
       }
     })()
   }, [setHasNFCPermission])
 
-  useEffect(() => {
+  React.useEffect(() => {
+    console.log("hasNFCPermission", hasNFCPermission)
+
     if (hasNFCPermission) {
       handleNFCScan()
     }
+
+    // handleNFCScan leads to an infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasNFCPermission])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!!nfcMessage && !!paymentRequest) nfcHandler()
   }, [nfcMessage, paymentRequest])
-
-  useEffect(() => {
-    if (paymentRequest !== "payout") {
-      setHasRedeemed(false)
-      setLnurl(null)
-    }
-  }, [paymentRequest])
 
   const nfcHandler = async () => {
     if (!nfcMessage.toLowerCase().includes("lnurl")) {
@@ -204,7 +143,7 @@ function NFCComponent({ paymentRequest }: Props) {
     }
 
     if (!paymentRequest) {
-      alert("Add an amount and create an invoice before scanning the card")
+      alert("add an amount and create an invoice before scanning the card")
       return
     }
 
@@ -219,53 +158,69 @@ function NFCComponent({ paymentRequest }: Props) {
       })
 
     setIsLoading(true)
-    try {
-      const [lnurlParams, parsedDestination] = await Promise.all([
-        getParams(nfcMessage),
-        parsePaymentDestination({
-          destination: nfcMessage,
-          network: "mainnet" as NetworkGaloyClient,
-          lnAddressDomains: ["lnflash.me", "pay.lnflash.me", "flashapp.me"],
-        }),
-      ])
+    const lnurlParams = await getParams(nfcMessage)
+    console.log("NFC MESSAGE>>>>>>>>>", nfcMessage)
 
-      console.log("LNURL PARAMS:", lnurlParams)
-      console.log("PARSED DESTINATION:", parsedDestination)
+    // >>>>>>>>>>
+    const parsedDestination = parsePaymentDestination({
+      destination: nfcMessage,
+      network: "mainnet" as NetworkGaloyClient, // hard coded to mainnet
+      lnAddressDomains: ["lnflash.me", "pay.lnflash.me", "flashapp.me"],
+    })
 
-      if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
-        alert(`Not a properly configured lnurl withdraw tag`)
-        setIsLoading(false)
-        return
+    console.log("GALOY PARSE PAYMENT DESTINATION>>>>", parsedDestination)
+    // <<<<<<<<<<<
+
+    console.log("LNURL PARAMS >>>>>>>>>>>>>>>>??????????", lnurlParams)
+    if (!("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest")) {
+      alert(
+        `not a properly configured lnurl withdraw tag\n\n${nfcMessage}\n\n${
+          "reason" in lnurlParams && lnurlParams.reason
+        }`,
+      )
+      setIsLoading(false)
+      return
+    }
+
+    const { callback, k1 } = lnurlParams
+
+    const urlObject = new URL(callback)
+    const searchParams = urlObject.searchParams
+    searchParams.set("k1", k1)
+    searchParams.set("pr", paymentRequest)
+
+    const url = urlObject.toString()
+
+    const result = await fetch(url)
+    const lnurlResponse = await result.json()
+
+    if (result.ok) {
+      if (lnurlResponse?.status?.toLowerCase() !== "ok") {
+        console.error(lnurlResponse, "error with redeeming")
+        alert(lnurlResponse.reason || "Something went wrong. Please, try again later")
       }
-
-      const { callback, k1 } = lnurlParams
-
-      if (!k1 || !paymentRequest) {
-        console.error("Missing k1 or paymentRequest for processing")
-        setIsLoading(false)
-        return
+    } else if (
+      (lnurlResponse.reason && lnurlResponse.reason.includes("not within bounds")) ||
+      lnurlResponse.reason.includes("Amount is bigger than the maximum")
+    ) {
+      alert("Payment Failed: Insufficient Funds")
+    } else {
+      let errorMessage = ""
+      try {
+        const decoded = await result.json()
+        if (decoded.reason) {
+          errorMessage += decoded.reason
+        }
+        if (decoded.message) {
+          errorMessage += decoded.message
+        }
+      } finally {
+        let message = `Error processing payment.\n\nHTTP error code: ${result.status}`
+        if (errorMessage) {
+          message += `\n\nError message: ${errorMessage}`
+        }
+        alert(message)
       }
-
-      const url = new URL(callback)
-      url.searchParams.set("k1", k1)
-      url.searchParams.set("pr", paymentRequest)
-
-      console.log("Constructed URL for redeem:", url.toString())
-
-      const result = await fetch(url.toString())
-      const lnurlResponse = await result.json()
-
-      console.log("LNURL Response:", lnurlResponse)
-
-      if (result.ok && lnurlResponse?.status?.toLowerCase() === "ok") {
-        console.log("Payment successful")
-      } else {
-        const errorMessage =
-          lnurlResponse?.reason || "Something went wrong. Please, try again later"
-        alert(errorMessage)
-      }
-    } catch (error) {
-      console.error("Error processing NFC payment", error)
     }
     setIsLoading(false)
   }
@@ -294,7 +249,7 @@ function NFCComponent({ paymentRequest }: Props) {
   return (
     <>
       {paymentRequest === undefined && (
-        <div className="d-flex w-full">
+        <div className="d-flex  w-full">
           <button
             data-testid="nfc-btn"
             className={styles.secondaryBtn}
@@ -318,4 +273,4 @@ function NFCComponent({ paymentRequest }: Props) {
   )
 }
 
-export default React.memo(NFCComponent)
+export default NFCComponent

@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container"
 import originalUrl from "original-url"
 import { bech32 } from "bech32"
 import { Image } from "react-bootstrap"
-import NFCComponent from "../../components/ParsePOSPayment/nfc"
+import NFCPayoutComponent from "../../components/ParsePOSPayment/payout"
 
 export async function getServerSideProps({
   req,
@@ -51,7 +51,6 @@ export default function NFCPage({
   username: string
   userHeader: string
 }) {
-  const payoutFlag = "payout"
   return (
     <>
       <Container fluid>
@@ -74,7 +73,7 @@ export default function NFCPage({
 
       <Row className="justify-content-center" style={{ width: "100vw", margin: 0 }}>
         <button className="print-paycode-button">Tap to Receive Rewards</button>
-        <NFCComponent paymentRequest={payoutFlag} />
+        <NFCPayoutComponent />
       </Row>
     </>
   )
