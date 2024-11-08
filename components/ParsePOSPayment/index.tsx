@@ -401,7 +401,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             if (state.createdInvoice) {
               dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
             } else {
-              console.log(">>>>>>>>>??????????", valueInSats)
+              console.log("VALUE IN SATS>>>>>>>>>??????????", valueInSats)
+              console.log("SATS TO USD>>>>>>>>>??????????", satsToUsd(valueInSats))
               if (satsToUsd(valueInSats) < 0.01) {
                 const { convertedCurrencyAmount, formattedCurrency } = satsToCurrency(
                   Math.ceil(usdToSats(0.01)),
