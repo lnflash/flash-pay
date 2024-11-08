@@ -267,7 +267,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 
   // Update Current Amount From Params
   React.useEffect(() => {
-    console.log("TEST ENV")
     if (!unit || !sats || !amount) return
     const { shouldUpdate, value } = updateCurrentAmountWithParams()
     if (shouldUpdate && value) {
@@ -401,18 +400,16 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             if (state.createdInvoice) {
               dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
             } else {
-              console.log("VALUE IN SATS>>>>>>>>>??????????", valueInSats)
-              console.log("SATS TO USD>>>>>>>>>??????????", satsToUsd(valueInSats))
               if (satsToUsd(valueInSats) < 0.01) {
-                const { convertedCurrencyAmount, formattedCurrency } = satsToCurrency(
+                const { formattedCurrency } = satsToCurrency(
                   Math.ceil(usdToSats(0.01)),
                   display,
                   currencyMetadata.fractionDigits,
                 )
-                console.log("convertedCurrencyAmount>>>>>>", convertedCurrencyAmount)
-                console.log("formattedCurrency>>>>>>", formattedCurrency)
                 toast.error(
-                  "Amount must be at least " + Math.ceil(usdToSats(0.01)) + " sats",
+                  `Amount must be at least ${Math.ceil(
+                    usdToSats(0.01),
+                  )} sats (${formattedCurrency})`,
                 )
               } else {
                 dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
