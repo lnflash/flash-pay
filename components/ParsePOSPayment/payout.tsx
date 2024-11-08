@@ -4,10 +4,7 @@ import axios from "axios"
 
 import LoadingComponent from "../loading"
 import styles from "./parse-payment.module.css"
-
-type Props = {
-  paymentRequest?: string | undefined
-}
+import { useRouter } from "next/router"
 
 // TODO: refine the interface
 interface NFCRecord {
@@ -15,13 +12,20 @@ interface NFCRecord {
   encoding?: string
 }
 
-function NFCPayoutComponent({ paymentRequest }: Props) {
+function PayoutComponent() {
   const [hasNFCPermission, setHasNFCPermission] = useState(false)
-  const [nfcMessage, setNfcMessage] = useState("")
   const [isNfcSupported, setIsNfcSupported] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [lnurl, setLnurl] = useState<string | null>(null)
   const [hasRedeemed, setHasRedeemed] = useState(false)
+  const router = useRouter()
+  const { nfcMessage } = router.query
+
+  useEffect(() => {
+    if (nfcMessage) {
+      extractLnurl(nfcMessage as string)
+    }
+  }, [nfcMessage])
 
   const decodeNDEFRecord = (record: NFCRecord) => {
     if (!record.data) {
@@ -131,8 +135,6 @@ function NFCPayoutComponent({ paymentRequest }: Props) {
         const text = decodeNDEFRecord(record)
 
         extractLnurl(text)
-
-        setNfcMessage(text)
       }
 
       ndef.onreadingerror = () => {
@@ -202,7 +204,11 @@ function NFCPayoutComponent({ paymentRequest }: Props) {
     )
   }
 
-  return <>{paymentRequest === undefined && <div className="d-flex w-full"></div>}</>
+  return (
+    <>
+      <div className="d-flex w-full"></div>
+    </>
+  )
 }
 
-export default React.memo(NFCPayoutComponent)
+export default React.memo(PayoutComponent)
