@@ -25,7 +25,7 @@ function Home() {
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
   const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState(
-    localStorage.getItem("display") ?? "USD",
+    localStorage.getItem("display") ?? "JMD",
   )
 
   const router = useRouter()
