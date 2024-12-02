@@ -58,10 +58,10 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       <Image
         src="/icons/cash-register-icon.svg"
         alt="cash register icon"
-        width="18"
-        height="18"
+        width="40"
+        height="40"
       />
-      Back to cash register
+      Back
     </button>
   )
 
@@ -70,11 +70,11 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       <Image
         src="/icons/print-icon.svg"
         alt="print icon"
-        width="18"
-        height="18"
+        width="40"
+        height="40"
         className="mr-2"
       />
-      Print Receipt
+      Print
     </button>
   )
 

@@ -1,0 +1,110 @@
+.home {
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  height: 50px;
+}
+
+.menuIcon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.submitButton {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 15px 20px; /* Increase padding for better touch target size */
+  border-radius: 25px; /* Rounded button */
+  font-size: 18px; /* Larger font for better readability */
+  font-weight: bold;
+  width: 100%; /* Full width for a mobile-friendly layout */
+  max-width: 300px; /* Optional: restrict maximum width */
+  margin: 20px auto; /* Center the button horizontally */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block; /* Ensure it's a block-level element for centering */
+}
+
+.submitButton:hover {
+  background-color: darkgreen; /* Slightly darker color on hover */
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%; /* Full width for better usability on mobile */
+  max-width: 100%; /* Optional: limit max width */
+  margin: 10px 0;
+}
+
+.dropdown select {
+  width: 100%; /* Full width */
+  padding: 12px 15px; /* Larger padding for easier interaction */
+  font-size: 16px; /* Larger font size for readability */
+  border: 1px solid #ccc; /* Light border for better visibility */
+  border-radius: 5px; /* Rounded corners for a modern look */
+  appearance: none; /* Removes default styles for better customization */
+  background: white
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007bff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  background-size: 16px; /* Increase arrow size */
+}
+
+.dropdown select:focus {
+  border-color: #007bff; /* Highlight border when focused */
+  outline: none; /* Remove default outline */
+}

@@ -34,18 +34,29 @@
   justify-content: center;
   align-items: center;
   column-gap: 0.5rem;
-  background: var(--linear-gradient);
-  border-radius: 10px;
+  background: #000; /* Matches the gradient */
+  border-radius: 10px; /* Same rounded corners */
   border: none;
   outline: none;
-  padding: 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 1.5rem; /* Larger padding for a modern look */
+  font-size: 3rem; /* Same font size */
+  font-weight: 600; /* Bold text */
   line-height: 24px;
-  width: 327px;
-  height: 27px;
-  color: #fff;
+  width: 327px; /* Same width */
+  height: auto; /* Adjust height dynamically */
+  color: #fff; /* White text for contrast */
   cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.3s ease; /* Smooth hover effect */
+}
+
+.back_btn:hover {
+  opacity: 0.9; /* Slightly transparent on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+  background: #333; /* Matches the gradient */
+}
+
+.back_btn:active {
+  transform: scale(0.95); /* Button presses inward slightly */
 }
 
 .receipt {
@@ -68,13 +79,29 @@
 }
 
 .pay_new_btn {
-  background-color: transparent;
-  color: rgb(83, 111, 242);
-  border: 2px solid rgb(83, 111, 242);
-  border-radius: 10px;
-  width: 270px;
-  height: 50px;
-  margin-bottom: 1rem;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 50px; /* Fully rounded corners for a modern look */
+  width: 100%; /* Full width for responsiveness */
+  max-width: 350px; /* Limit width for larger screens */
+  height: auto; /* Adjust height dynamically */
+  padding: 1rem 2rem; /* Larger padding for easier interaction */
+  font-size: 3rem; /* Bigger font size for readability */
+  font-weight: 600; /* Bold text */
+  text-align: center; /* Center text */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-bottom: 1.5rem; /* Increased spacing */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Add smooth effects */
+}
+
+.pay_new_btn:hover {
+  background-color: #333; /* Slightly darker blue on hover */
+  transform: scale(1.05); /* Slight zoom-in effect */
+}
+
+.pay_new_btn:active {
+  transform: scale(0.95); /* Slight press-down effect */
 }
 
 .reference {

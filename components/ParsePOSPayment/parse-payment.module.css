@@ -386,3 +386,50 @@
     transform: rotate(360deg);
   }
 }
+
+.pay_btn_container {
+  display: flex;
+  flex-direction: column; /* Arrange buttons vertically */
+  align-items: center; /* Center-align the buttons */
+  margin-top: 20px; /* Add spacing above the buttons */
+}
+
+.nextButton {
+  width: 100%; /* Full width */
+  min-height: 100px; /* Set a minimum height */
+  max-width: 400px; /* Optional: Restrict the button's maximum width */
+  padding: 15px; /* Add larger padding for a bigger button */
+  font-size: 42px; /* Increase font size for better visibility */
+  font-weight: normal; /* Bold text */
+  color: white; /* White text */
+  background-color: green; /* Blue background */
+  border: none; /* Remove default border */
+  border-radius: 30px; /* Make the button fully rounded */
+  cursor: pointer; /* Add pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.nextButton:hover {
+  background-color: darkgreen; /* Darker blue on hover */
+}
+
+.nextButton:active {
+  background-color: rgb(0, 55, 0); /* Even darker blue when pressed */
+}
+
+.clear_btn {
+  margin-top: 10px; /* Add spacing between the buttons */
+  font-size: 16px; /* Slightly smaller than the NEXT button */
+  padding: 10px; /* Add padding for better touchability */
+  color: #555; /* Gray text for less prominence */
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 20px; /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear_btn:hover {
+  background-color: #ddd; /* Slightly darker background on hover */
+}

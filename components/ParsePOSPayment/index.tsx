@@ -391,26 +391,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       )}
 
       <div className={styles.pay_btn_container}>
-        <button
-          className={state.createdInvoice ? styles.pay_new_btn : styles.pay_btn}
-          onClick={() => {
-            if (state.createdInvoice) {
-              dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
-            } else {
-              dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
-            }
-          }}
-        >
-          <Image
-            src={
-              state.createdInvoice ? "/icons/caret-left.svg" : "/icons/lightning-icon.svg"
-            }
-            alt="lightning icon"
-            width="20"
-            height="20"
-          />
-          {state.createdInvoice ? "Back" : "Create invoice"}
-        </button>
         {!state.createdInvoice && (
           <button
             className={styles.clear_btn}
@@ -425,6 +405,18 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             Clear
           </button>
         )}
+        <button
+          className={styles.nextButton} // Apply updated styles
+          onClick={() => {
+            if (state.createdInvoice) {
+              dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
+            } else {
+              dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
+            }
+          }}
+        >
+          {state.createdInvoice ? "Back" : "Next"}
+        </button>
       </div>
     </Container>
   )

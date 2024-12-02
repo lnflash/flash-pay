@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 
 import AppLayout from "../components/Layouts/AppLayout"
 import { APP_DESCRIPTION } from "../config/config"
+import { useEffect, useState } from "react"
 
 const GraphQLProvider = dynamic(() => import("../lib/graphql"), { ssr: false })
 
@@ -19,6 +20,29 @@ export default function Layout({
   pageProps: Record<string, unknown>
 }) {
   const { username } = useRouter().query
+
+  // State to track if the menu icon is visible
+  const [isMenuVisible, setMenuVisible] = useState(false)
+
+  // Load the menu visibility state from localStorage on mount
+  useEffect(() => {
+    const savedMenuState = localStorage.getItem("menuVisible")
+    if (savedMenuState === "true") {
+      setMenuVisible(true)
+    }
+  }, [])
+
+  // Function to make the menu visible after "Start"
+  const handleStartClick = () => {
+    setMenuVisible(true) // Show the menu
+    localStorage.setItem("menuVisible", "true") // Save menu visibility state
+  }
+
+  const handleHideMenu = () => {
+    setMenuVisible(false)
+    localStorage.setItem("menuVisible", "false")
+  }
+
   return (
     <>
       <Head>
@@ -47,8 +71,12 @@ export default function Layout({
         <title>Flash Cash Register</title>
       </Head>
       <GraphQLProvider>
-        <AppLayout username={username}>
-          <Component {...pageProps} />
+        <AppLayout username={username} isMenuVisible={isMenuVisible}>
+          <Component
+            {...pageProps}
+            onStart={handleStartClick}
+            onHideMenu={handleHideMenu}
+          />
         </AppLayout>
       </GraphQLProvider>
     </>
