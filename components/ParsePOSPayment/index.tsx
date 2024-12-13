@@ -276,7 +276,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   }, [amount, sats, unit, dispatch])
 
   return (
-    <Container className={styles.digits_container}>
+    <Container style={{ padding: 0 }}>
       <div className={styles.output}>
         {!state.createdInvoice && !isRunningStandalone() && (
           <button
@@ -292,40 +292,51 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           </button>
         )}
         <div
-          className={`${
-            !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
-          }`}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            flex: 1,
+          }}
         >
-          <CurrencyInput
-            style={{
-              width: "100%",
-              border: 0,
-              color: "black",
-              backgroundColor: "transparent",
-              textAlign: "center",
-              fontWeight: 600,
-            }}
-            value={!amount ? 0 : valueInFiat}
-            intlConfig={{ locale: navigator.language, currency: display }}
-            readOnly={true}
-          />
-        </div>
-        <div
-          className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
-          }`}
-        >
-          {unit === "CENT" ? "≈" : ""} {formatOperand(valueInSats.toString())} sats
-          {!hasLoaded.current && (
-            <span
+          <div
+            className={`${
+              !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
+            }`}
+          >
+            <CurrencyInput
               style={{
-                fontSize: "1rem",
-                marginLeft: ".5rem",
-                width: "18px",
-                height: "18px",
+                width: "100%",
+                border: 0,
+                color: "black",
+                backgroundColor: "transparent",
+                textAlign: "center",
+                fontWeight: 600,
               }}
-              className={styles.spinner}
-            ></span>
-          )}
+              value={!amount ? 0 : valueInFiat}
+              intlConfig={{ locale: navigator.language, currency: display }}
+              readOnly={true}
+            />
+          </div>
+          <div
+            className={`${
+              unit === AmountUnit.Sat ? styles.zero_order : styles.first_order
+            }
+          }`}
+          >
+            {unit === "CENT" ? "≈" : ""} {formatOperand(valueInSats.toString())} sats
+            {!hasLoaded.current && (
+              <span
+                style={{
+                  fontSize: "1rem",
+                  marginLeft: ".5rem",
+                  width: "18px",
+                  height: "18px",
+                }}
+                className={styles.spinner}
+              ></span>
+            )}
+          </div>
         </div>
         {state.createdInvoice ? null : (
           <button title="toggle currency" onClick={() => toggleCurrency()}>
@@ -391,6 +402,18 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       )}
 
       <div className={styles.pay_btn_container}>
+        <button
+          className={styles.nextButton}
+          onClick={() => {
+            if (state.createdInvoice) {
+              dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
+            } else {
+              dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
+            }
+          }}
+        >
+          {state.createdInvoice ? "Back" : "Next"}
+        </button>
         {!state.createdInvoice && (
           <button
             className={styles.clear_btn}
@@ -405,18 +428,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             Clear
           </button>
         )}
-        <button
-          className={styles.nextButton} // Apply updated styles
-          onClick={() => {
-            if (state.createdInvoice) {
-              dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
-            } else {
-              dispatch({ type: ACTIONS.CREATE_INVOICE, payload: amount?.toString() })
-            }
-          }}
-        >
-          {state.createdInvoice ? "Back" : "Next"}
-        </button>
       </div>
     </Container>
   )

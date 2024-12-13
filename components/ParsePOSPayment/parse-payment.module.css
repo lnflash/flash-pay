@@ -17,13 +17,11 @@
 
 .output {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex: 1;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  position: relative;
-  max-width: 400px;
-  margin: 0 auto;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .output > button {
@@ -34,8 +32,6 @@
   border-radius: 6px;
   border: none;
   outline: none;
-  position: absolute;
-  right: 0;
 }
 
 .output .pin_icon {
@@ -50,8 +46,6 @@
   color: black;
   outline: none;
   border: none;
-  position: absolute;
-  left: 0%;
   width: fit-content;
 }
 
@@ -108,14 +102,6 @@
   }
 }
 
-.pay_btn_container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  column-gap: 0.5rem;
-  margin-top: 2rem;
-}
-
 .pay_btn,
 .pay_new_btn {
   background: var(--linear-gradient);
@@ -170,7 +156,7 @@
   background-repeat: no-repeat;
   z-index: -1;
   transition: background-size 0.25s ease;
-  border-radius: 10px;
+  /* border-radius: 10px; */
 }
 
 .clear_btn:hover,
@@ -207,7 +193,7 @@
   column-gap: 15px;
   font-size: 14px;
   font-weight: 300;
-  margin-top: 30px;
+  margin-top: 10px;
   margin-bottom: 5px;
 }
 
@@ -267,11 +253,11 @@
 }
 
 .qr_clipboard {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: 1fr 1fr;
-  align-items: center;
+  display: flex;
+  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .qr_clipboard > button {
@@ -314,7 +300,6 @@
   color: green;
   padding: 30% 1rem;
   margin-top: 2rem;
-  outline: 1px dashed rgba(0, 128, 0, 0.35);
 }
 
 .error {
@@ -353,7 +338,6 @@
 
 .error {
   color: red;
-  outline: 1px dashed rgba(255, 0, 0, 0.35);
 }
 
 .spinner {
@@ -391,20 +375,21 @@
   display: flex;
   flex-direction: column; /* Arrange buttons vertically */
   align-items: center; /* Center-align the buttons */
-  margin-top: 20px; /* Add spacing above the buttons */
+  padding-top: 10px;
+  padding-bottom: 15px;
 }
 
 .nextButton {
-  width: 100%; /* Full width */
-  min-height: 100px; /* Set a minimum height */
+  width: 90%; /* Full width */
+  min-height: 50px; /* Set a minimum height */
   max-width: 400px; /* Optional: Restrict the button's maximum width */
-  padding: 15px; /* Add larger padding for a bigger button */
-  font-size: 42px; /* Increase font size for better visibility */
+  padding: 5px; /* Add larger padding for a bigger button */
+  font-size: 36px; /* Increase font size for better visibility */
   font-weight: normal; /* Bold text */
   color: white; /* White text */
   background-color: green; /* Blue background */
   border: none; /* Remove default border */
-  border-radius: 30px; /* Make the button fully rounded */
+  border-radius: 10px; /* Make the button fully rounded */
   cursor: pointer; /* Add pointer cursor on hover */
   transition: background-color 0.3s ease; /* Smooth transition effect */
   font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -419,13 +404,15 @@
 }
 
 .clear_btn {
+  width: 80%;
+  max-width: 350px;
   margin-top: 10px; /* Add spacing between the buttons */
   font-size: 16px; /* Slightly smaller than the NEXT button */
   padding: 10px; /* Add padding for better touchability */
   color: #555; /* Gray text for less prominence */
   background-color: #f9f9f9; /* Light background */
   border: 1px solid #ccc; /* Subtle border */
-  border-radius: 20px; /* Rounded corners */
+  border-radius: 10px; /* Rounded corners */
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
