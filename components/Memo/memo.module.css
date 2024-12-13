@@ -3,7 +3,7 @@
   justify-content: space-between;
   width: 100%;
   margin: 0 auto;
-  padding-top: 2rem;
+  margin-top: 10px;
 }
 
 .container > div {
@@ -34,11 +34,10 @@
 
 .add_btn {
   position: relative;
-  background-color: #fff;
   display: inline-flex;
   align-items: center;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid #000;
+  border-radius: 10px;
   font-weight: 600;
   padding: 0.5rem;
   color: var(--primary-black);
