@@ -49,12 +49,8 @@ export default function CurrencyDropdown({
         }
         setIsDropDownOpen(false)
       }}
-      onFocus={() => {
-        setIsDropDownOpen(true)
-      }}
-      onBlur={() => {
-        setIsDropDownOpen(false)
-      }}
+      onFocus={() => setIsDropDownOpen(true)}
+      onBlur={() => setIsDropDownOpen(false)}
     >
       {currencyData?.currencyList?.map((option) => {
         const fullLabel = `${option.id} - ${option.name} ${
@@ -64,9 +60,7 @@ export default function CurrencyDropdown({
         const isSelected = selectedDisplayCurrency === option.id
         return (
           <option key={option.id} value={option.id}>
-            {isDropDownOpen && fullLabel}
-            {!isDropDownOpen &&
-              (isSelected ? (showOnlyFlag ? flagOnlyLabel : fullLabel) : fullLabel)}
+            {isDropDownOpen ? fullLabel : showOnlyFlag ? flagOnlyLabel : fullLabel}
           </option>
         )
       })}
