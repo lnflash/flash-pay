@@ -94,13 +94,10 @@ function ReceivePayment({ onHideMenu }: { onHideMenu: () => void }) {
             <h1 className={styles.username}>{`Pay ${username}`}</h1>
             <CurrencyDropdown
               style={{
-                width: "80px",
-                height: "42px",
-                border: "none",
+                width: "60px",
+                height: "32px",
                 borderRadius: "5px",
                 fontSize: "18px",
-                textAlign: "center",
-                appearance: "none",
               }}
               showOnlyFlag
               onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
