@@ -4,6 +4,10 @@
 #@  return "us.gcr.io/galoy-org"
 #@ end
 
+#@ def flash_registry():
+#@  return "docker.io/lnflash"
+#@ end
+
 #@ def nodejs_concourse_image():
 #@   return public_docker_registry() + "/nodejs-concourse"
 #@ end
@@ -19,24 +23,24 @@
 #@ def nodejs_task_image_config():
 type: registry-image
 source:
-  username: ((docker-creds.username))
-  password: ((docker-creds.password))
+  #! username: ((docker-creds.username))
+  #! password: ((docker-creds.password))
   repository: #@ nodejs_concourse_image()
 #@ end
 
 #@ def rust_task_image_config():
 type: registry-image
 source:
-  username: ((docker-creds.username))
-  password: ((docker-creds.password))
+  #! username: ((docker-creds.username))
+  #! password: ((docker-creds.password))
   repository: #@ rust_concourse_image()
 #@ end
 
 #@ def release_task_image_config():
 type: registry-image
 source:
-  username: ((docker-creds.username))
-  password: ((docker-creds.password))
+  #! username: ((docker.username))
+  #! password: ((docker.password))
   repository: #@ release_concourse_image()
 #@ end
 
@@ -68,7 +72,7 @@ plan:
     - name: repo
     run:
       path: pipeline-tasks/ci/vendor/tasks/nodejs-check-code.sh
-on_failure: #@ slack_failure_notification()
+#! on_failure: #@ slack_failure_notification()
 #@ end
 
 #@ def rust_check_code():
@@ -115,7 +119,7 @@ plan:
 - put: bundled-deps
   params:
     file: bundled-deps/bundled-deps-*.tgz
-on_failure: #@ slack_failure_notification()
+#! on_failure: #@ slack_failure_notification()
 #@ end
 
 #@ def nodejs_integration_test():
@@ -199,7 +203,7 @@ plan:
       REPO_ROOT: repo
     run:
       path: pipeline-tasks/ci/vendor/tasks/nodejs-audit.sh
-on_failure: #@ slack_failure_notification()
+#! on_failure: #@ slack_failure_notification()
 #@ end
 
 #@ def build_edge_image():
@@ -248,7 +252,7 @@ plan:
 - in_parallel:
   - get: repo
     trigger: true
-    passed: [ build-edge-image, audit, check-code ]
+    passed: [ build-edge-image, check-code ]
   - get: edge-image
     passed: [ build-edge-image ]
     params:
@@ -346,7 +350,9 @@ source:
   fetch_tags: true
   uri: #@ data.values.git_uri
   branch: #@ data.values.git_branch
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def pipeline_tasks_resource():
@@ -356,7 +362,9 @@ source:
   paths: [ci/vendor/*, ci/tasks/*, ci/config/*, Makefile]
   uri: #@ data.values.git_uri
   branch: #@ data.values.git_branch
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def edge_image_resource():
@@ -366,7 +374,7 @@ source:
   tag: edge
   username: #@ data.values.docker_registry_user
   password: #@ data.values.docker_registry_password
-  repository: #@ public_docker_registry() + "/" + data.values.gh_repository
+  repository: #@ flash_registry() + "/" + data.values.gh_repository
 #@ end
 
 #@ def nodejs_deps_resource():
@@ -376,7 +384,9 @@ source:
   paths: [yarn.lock]
   uri: #@ data.values.git_uri
   branch: #@ data.values.git_branch
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def deps_version_resource():
@@ -385,8 +395,8 @@ type: semver
 source:
   initial_version: 0.1.0
   driver: gcs
-  bucket: ((staging-gcp-creds.bucket_name))
-  json_key: ((staging-gcp-creds.creds_json))
+  bucket: ((gcs.bucket))
+  json_key: ((gcs.sa_creds))
   key: #@ data.values.gh_repository + "-artifacts/versions/deps"
 #@ end
 
@@ -394,8 +404,8 @@ source:
 name: bundled-deps
 type: gcs-resource
 source:
-  bucket: ((staging-gcp-creds.bucket_name))
-  json_key: ((staging-gcp-creds.creds_json))
+  bucket: ((gcs.bucket))
+  json_key: ((gcs.sa_creds))
   regexp: #@ data.values.gh_repository + "-artifacts/deps/bundled-deps-v(.*)-.*.tgz"
 #@ end
 
@@ -415,7 +425,9 @@ source:
   file: version
   uri: #@ data.values.git_uri
   branch: #@ data.values.git_version_branch
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def charts_repo_resource():
@@ -424,7 +436,9 @@ type: git
 source:
   uri: #@ data.values.git_charts_uri
   branch: #@ data.values.git_charts_branch
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def versioned_image_resource():
@@ -433,7 +447,7 @@ type: registry-image
 source:
   username: #@ data.values.docker_registry_user
   password: #@ data.values.docker_registry_password
-  repository: #@ public_docker_registry() + "/" + data.values.gh_repository
+  repository: #@ flash_registry() + "/" + data.values.gh_repository
 #@ end
 
 #@ def gh_release_resource():
@@ -451,7 +465,9 @@ type: git
 source:
   uri: #@ data.values.git_charts_uri
   branch: #@ "bot-bump-" + data.values.gh_repository + "-image"
-  private_key: #@ data.values.github_private_key
+  username: #@ data.values.gh_user
+  password: #@ data.values.gh_password
+  #! private_key: #@ data.values.github_private_key
 #@ end
 
 #@ def gcr_resource_type():

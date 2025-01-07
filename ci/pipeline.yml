@@ -50,7 +50,7 @@ resources:
 - #@ nodejs_deps_resource()
 - #@ deps_version_resource()
 - #@ bundled_deps_resource()
-- #@ slack_resource()
+#! - #@ slack_resource()
 
 - #@ version_resource()
 - #@ charts_repo_resource()
@@ -61,4 +61,4 @@ resources:
 
 resource_types:
 - #@ gcr_resource_type()
-- #@ slack_resource_type()
+#! - #@ slack_resource_type()
