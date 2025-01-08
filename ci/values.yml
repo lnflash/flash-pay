@@ -1,17 +1,21 @@
 #@data/values
 ---
-git_uri: git@github.com:GaloyMoney/galoy-pay.git
+git_uri: https://github.com/lnflash/flash-pay.git
 git_branch: main
-git_charts_uri: git@github.com:GaloyMoney/charts.git
+git_charts_uri: https://github.com/lnflash/charts.git
 git_charts_branch: main
-git_charts_bot_branch: bot-bump-galoy-pay-image
-github_private_key: ((github.private_key))
-github_token: ((github.api_token))
-docker_registry: us.gcr.io/galoy-org
-docker_registry_user: ((docker-creds.username))
-docker_registry_password: ((docker-creds.password))
+git_charts_bot_branch: bot-bump-flash-pay-image
+docker_registry: ((docker.registry))
+docker_registry_user: ((docker.username))
+docker_registry_password: ((docker.password))
 git_version_branch: version
-gh_org: GaloyMoney
-gh_repository: galoy-pay
+gh_org: lnflash
+gh_repository: flash-pay
+#! github_private_key: ((github.private_key))
+gh_user: ((github.username)) 
+gh_password: ((github.api_token)) 
+github_token: ((github.api_token))
+
+#! UNUSED
 slack_channel: galoy-pay-github
 slack_webhook_url: ((addons-slack.api_url))

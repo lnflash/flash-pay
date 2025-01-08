@@ -23,7 +23,7 @@ ${digest}
 
 Code diff contained in this image:
 
-https://github.com/GaloyMoney/${CHARTS_SUBDIR}/compare/${old_ref}...${ref}
+https://github.com/lnflash/${CHARTS_SUBDIR}/compare/${old_ref}...${ref}
 EOF
 
 gh pr close ${BOT_BRANCH} || true
@@ -32,5 +32,5 @@ gh pr create \
   --body-file ../body.md \
   --base ${BRANCH} \
   --head ${BOT_BRANCH} \
-  --label galoybot \
+  --label flashbot \
   --label ${CHARTS_SUBDIR}
