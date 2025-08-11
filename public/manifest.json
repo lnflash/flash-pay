@@ -1,15 +1,28 @@
 {
-  "name": "POS Cash Register",
-  "short_name": "Cash Register",
-  "description": "A Bitcoin POS cash register application that connects with the merchant's wallet",
-  "start_url": "/setuppwa/",
+  "name": "Flash POS",
+  "short_name": "Flash POS",
+  "description": "Lightning-fast Bitcoin payments for merchants",
+  "start_url": "/pos",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#536FF2",
-  "theme_color": "#536FF2",
-  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF9500",
+  "orientation": "portrait",
   "id": "/",
+  "categories": ["finance", "business"],
   "icons": [
+    {
+      "src": "/FLASH-ICON.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/FLASH-ICON.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
     {
       "src": "/manifest-logo/logo72x72.svg",
       "type": "image/svg",
@@ -49,6 +62,22 @@
       "src": "/manifest-logo/logo512x512.svg",
       "type": "image/svg",
       "sizes": "512x512"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Transaction",
+      "short_name": "New",
+      "description": "Start a new transaction",
+      "url": "/pos",
+      "icons": [{ "src": "/FLASH-ICON.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Transaction History",
+      "short_name": "History",
+      "description": "View transaction history",
+      "url": "/transactions",
+      "icons": [{ "src": "/FLASH-ICON.png", "sizes": "96x96" }]
     }
   ]
 }
