@@ -1,4 +1,3 @@
-import "bootstrap/dist/css/bootstrap.min.css"
 import "./index.css"
 
 import { NextPage } from "next"
@@ -6,10 +5,12 @@ import dynamic from "next/dynamic"
 import Head from "next/head"
 import { useRouter } from "next/router"
 
-import AppLayout from "../components/Layouts/AppLayout"
 import { APP_DESCRIPTION } from "../config/config"
+import { ReduxProvider } from "../src/providers/ReduxProvider"
+import { ThemeProvider } from "../src/providers/ThemeProvider"
 
 const GraphQLProvider = dynamic(() => import("../lib/graphql"), { ssr: false })
+const AppLayout = dynamic(() => import("../components/Layouts/AppLayout"), { ssr: false })
 
 export default function Layout({
   Component,
@@ -25,8 +26,8 @@ export default function Layout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={APP_DESCRIPTION} />
-        <meta name="theme-color" content="#536FF2" />
-        <meta name="apple-mobile-web-app-status-bar" content="#536FF2" />
+        <meta name="theme-color" content="#FF9500" />
+        <meta name="apple-mobile-web-app-status-bar" content="#FF9500" />
         <link rel="apple-touch-icon" href="/FLASH-ICON.png" />
         <link rel="icon" type="image/png" href="/FLASH-ICON.png" />
         <script
@@ -44,13 +45,17 @@ export default function Layout({
     `,
           }}
         />
-        <title>Flash Cash Register</title>
+        <title>Flash POS</title>
       </Head>
-      <GraphQLProvider>
-        <AppLayout username={username}>
-          <Component {...pageProps} />
-        </AppLayout>
-      </GraphQLProvider>
+      <ReduxProvider>
+        <ThemeProvider>
+          <GraphQLProvider>
+            <AppLayout username={username}>
+              <Component {...pageProps} />
+            </AppLayout>
+          </GraphQLProvider>
+        </ThemeProvider>
+      </ReduxProvider>
     </>
   )
 }
