@@ -20,7 +20,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }, [dispatch])
 
   if (requirePin && isPinSet && !isAuthenticated) {
-    return <PinVerify onSuccess={() => {}} />
+    return <PinVerify onSuccess={() => {
+      // Pin verification successful
+    }} />
   }
 
   return <>{children}</>

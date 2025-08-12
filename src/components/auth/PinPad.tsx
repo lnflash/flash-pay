@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Grid, IconButton, Typography, Paper } from '@mui/material'
-import { Backspace, FiberManualRecord } from '@mui/icons-material'
+import { Backspace } from '@mui/icons-material'
 import { styled } from '@mui/material/styles'
 
 const PinButton = styled(IconButton)(({ theme }) => ({
@@ -22,7 +22,13 @@ const PinButton = styled(IconButton)(({ theme }) => ({
   transition: 'all 0.2s ease',
 }))
 
-const PinDot = styled(Box)(({ theme, filled }: { theme?: any; filled: boolean }) => ({
+interface PinDotProps {
+  filled?: boolean
+}
+
+const PinDot = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'filled'
+})<PinDotProps>(({ theme, filled }) => ({
   width: 16,
   height: 16,
   borderRadius: '50%',

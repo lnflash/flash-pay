@@ -141,7 +141,7 @@ export const InvoiceDisplay: React.FC<InvoiceDisplayProps> = ({
         <Chip
           label={invoice.status.toUpperCase()}
           color={getStatusColor()}
-          icon={getStatusIcon()}
+          icon={getStatusIcon() || undefined}
           size="small"
         />
       </Box>

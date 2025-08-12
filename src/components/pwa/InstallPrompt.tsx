@@ -92,10 +92,10 @@ export const InstallPrompt: React.FC = () => {
               Tap the Share button in Safari
             </Typography>
             <Typography component="li" variant="body2" gutterBottom>
-              Scroll down and tap "Add to Home Screen"
+              Scroll down and tap &quot;Add to Home Screen&quot;
             </Typography>
             <Typography component="li" variant="body2" gutterBottom>
-              Tap "Add" to install
+              Tap &quot;Add&quot; to install
             </Typography>
           </Box>
         </DialogContent>
