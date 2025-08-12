@@ -56,8 +56,12 @@ export const AmountDisplay: React.FC = () => {
     const num = parseFloat(currentAmount)
     if (isNaN(num) || num === 0) return null
     
-    const sats = convertToSats(num)
-    return sats ? `≈ ${sats.toLocaleString()} sats` : null
+    try {
+      const sats = convertToSats(num)
+      return sats ? `≈ ${sats.toLocaleString()} sats` : null
+    } catch (error) {
+      return null
+    }
   }, [currentAmount, convertToSats, loading])
 
   const usdAmount = useMemo(() => {
@@ -65,11 +69,15 @@ export const AmountDisplay: React.FC = () => {
     const num = parseFloat(currentAmount)
     if (isNaN(num) || num === 0) return null
     
-    const sats = convertToSats(num)
-    if (!sats) return null
-    
-    const usd = convertFromSats(sats, 'USD')
-    return usd ? `≈ ${formatCurrency(usd, 'USD')}` : null
+    try {
+      const sats = convertToSats(num)
+      if (!sats) return null
+      
+      const usd = convertFromSats(sats, 'USD')
+      return usd ? `≈ ${formatCurrency(usd, 'USD')}` : null
+    } catch (error) {
+      return null
+    }
   }, [currentAmount, convertToSats, convertFromSats, loading, displayCurrency])
 
   return (

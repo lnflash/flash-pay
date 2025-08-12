@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Paper, Typography, Button } from '@mui/material'
 import { CheckCircle } from '@mui/icons-material'
-import Lottie from 'react-lottie'
+import dynamic from 'next/dynamic'
 import successAnimation from '../../../components/success-animation.json'
 import { useAppSelector } from '../../store/hooks'
 import { formatCurrency } from '../../utils/currency'
+
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false })
 
 interface PaymentSuccessProps {
   amount: number
@@ -16,8 +18,10 @@ export const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
   onComplete,
 }) => {
   const { displayCurrency } = useAppSelector(state => state.settings)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     if (navigator.vibrate) {
       navigator.vibrate([100, 50, 100])
     }
@@ -59,9 +63,11 @@ export const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
           width: '100%',
         }}
       >
-        <Box sx={{ width: 200, height: 200, mx: 'auto', mb: 2 }}>
-          <Lottie options={defaultOptions} height={200} width={200} />
-        </Box>
+        {mounted && (
+          <Box sx={{ width: 200, height: 200, mx: 'auto', mb: 2 }}>
+            <Lottie options={defaultOptions} height={200} width={200} />
+          </Box>
+        )}
 
         <CheckCircle sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
 

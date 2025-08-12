@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useRealtimePrice } from '../../lib/use-realtime-price'
+import useExistingSatPrice from '../../lib/use-sat-price'
 
 export const useSatPrice = (displayCurrency: string) => {
-  const { satsToUsd, usdToSats } = useRealtimePrice()
+  const { satsToUsd, usdToSats } = useExistingSatPrice()
   const [loading, setLoading] = useState(false)
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({
     USD: 1,

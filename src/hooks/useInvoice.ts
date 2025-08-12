@@ -82,7 +82,7 @@ export const useInvoice = (walletId?: string) => {
     dispatch(setGenerating(true))
 
     try {
-      const satsAmount = convertToSats(amount)
+      const satsAmount = convertToSats ? convertToSats(amount) : Math.round(amount * 100000)
       if (!satsAmount) {
         throw new Error('Could not convert amount to sats')
       }
