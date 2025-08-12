@@ -9,6 +9,7 @@
     "dev": "next dev",
     "start": "next start",
     "build": "next build",
+    "export": "next export",
     "prettier-check": "prettier --check .",
     "prettier-fix": "prettier '**/*.{js,ts,tsx,json}' --write",
     "eslint-check": "eslint \"{pages,components,lib}/**/*.ts\"",

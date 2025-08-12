@@ -1,0 +1,14 @@
+[build]
+  command = "yarn build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/.well-known/lnurlp/:username"
+  to = "/api/lnurlp/:username"
+  status = 200
