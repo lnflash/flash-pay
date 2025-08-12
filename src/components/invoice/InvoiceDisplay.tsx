@@ -8,6 +8,8 @@ import {
   CircularProgress,
   Button,
   Divider,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material'
 import {
   ContentCopy,
@@ -15,10 +17,13 @@ import {
   CheckCircle,
   Cancel,
   ArrowBack,
+  QrCode2,
+  Nfc,
 } from '@mui/icons-material'
 import QRCode from 'react-qr-code'
 import { useAppSelector } from '../../store/hooks'
 import { formatCurrency } from '../../utils/currency'
+import { NFCReader } from '../payment/NFCReader'
 import copy from 'copy-to-clipboard'
 import toast from 'react-hot-toast'
 
@@ -42,6 +47,7 @@ export const InvoiceDisplay: React.FC<InvoiceDisplayProps> = ({
   const { displayCurrency } = useAppSelector(state => state.settings)
   const [timeLeft, setTimeLeft] = useState<number>(0)
   const [qrSize, setQrSize] = useState(250)
+  const [displayMode, setDisplayMode] = useState<'qr' | 'nfc'>('qr')
 
   useEffect(() => {
     const updateQrSize = () => {
@@ -154,26 +160,58 @@ export const InvoiceDisplay: React.FC<InvoiceDisplayProps> = ({
 
       {invoice.status === 'pending' && (
         <>
-          <Box display="flex" justifyContent="center" my={3}>
-            <Box 
-              sx={{ 
-                p: 2, 
-                backgroundColor: 'white',
-                borderRadius: 2,
-                display: 'inline-block',
-              }}
+          <Box display="flex" justifyContent="center" mb={2}>
+            <ToggleButtonGroup
+              value={displayMode}
+              exclusive
+              onChange={(_, newMode) => newMode && setDisplayMode(newMode)}
+              size="small"
             >
-              <QRCode
-                value={`lightning:${invoice.paymentRequest}`}
-                size={qrSize}
-                level="M"
-              />
-            </Box>
+              <ToggleButton value="qr">
+                <QrCode2 sx={{ mr: 1 }} />
+                QR Code
+              </ToggleButton>
+              <ToggleButton value="nfc">
+                <Nfc sx={{ mr: 1 }} />
+                NFC Tap
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Box>
 
-          <Typography variant="body2" align="center" color="text.secondary" gutterBottom>
-            Scan QR code or tap NFC card to pay
-          </Typography>
+          {displayMode === 'qr' ? (
+            <>
+              <Box display="flex" justifyContent="center" my={3}>
+                <Box 
+                  sx={{ 
+                    p: 2, 
+                    backgroundColor: 'white',
+                    borderRadius: 2,
+                    display: 'inline-block',
+                  }}
+                >
+                  <QRCode
+                    value={`lightning:${invoice.paymentRequest}`}
+                    size={qrSize}
+                    level="M"
+                  />
+                </Box>
+              </Box>
+
+              <Typography variant="body2" align="center" color="text.secondary" gutterBottom>
+                Scan QR code to pay with Lightning
+              </Typography>
+            </>
+          ) : (
+            <Box my={2}>
+              <NFCReader
+                onRead={(data) => {
+                  // Handle NFC payment data
+                  console.log('NFC data received:', data)
+                }}
+                isActive={true}
+              />
+            </Box>
+          )}
 
           <Box display="flex" justifyContent="center" gap={2} my={2}>
             <Button

@@ -47,6 +47,7 @@
     "i18n-js": "^3.9.2",
     "ioredis": "^5.3.1",
     "js-lnurl": "^0.6.0",
+    "jsqr": "^1.4.0",
     "lnurl-pay": "^3.0.1",
     "lodash.debounce": "^4.0.8",
     "moment": "^2.30.1",
