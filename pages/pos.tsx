@@ -11,10 +11,17 @@ import { clearCurrentInvoice } from '../src/store/slices/invoiceSlice'
 import { setUsername } from '../src/store/slices/authSlice'
 import { useAccountDefaultWalletsQuery } from '../lib/graphql/generated'
 import { useInvoice } from '../src/hooks/useInvoice'
-import { useSubscription } from '@apollo/client'
+import { useSubscription, gql } from '@apollo/client'
 import LoadingComponent from '../components/loading'
 
 type PageState = 'pos' | 'invoice' | 'success' | 'pin-setup'
+
+// Dummy subscription to use when no invoice exists
+const DUMMY_SUBSCRIPTION = gql`
+  subscription DummySubscription {
+    __typename
+  }
+`
 
 export default function POS() {
   const router = useRouter()
@@ -36,18 +43,18 @@ export default function POS() {
   const walletId = data?.accountDefaultWallet?.id
   const { generateInvoice, subscribeToInvoiceStatus } = useInvoice(walletId)
 
-  // Subscribe to invoice status
+  // Subscribe to invoice status - use dummy subscription when no invoice
+  const subscriptionConfig = currentInvoice 
+    ? subscribeToInvoiceStatus(currentInvoice.paymentRequest, currentInvoice.paymentHash)
+    : null
+  
   const { data: statusData } = useSubscription(
-    currentInvoice ? subscribeToInvoiceStatus(
-      currentInvoice.paymentRequest,
-      currentInvoice.paymentHash
-    ).subscription : null as any,
-    currentInvoice ? {
-      variables: subscribeToInvoiceStatus(
-        currentInvoice.paymentRequest,
-        currentInvoice.paymentHash
-      ).variables,
-    } : { skip: true }
+    subscriptionConfig?.subscription || DUMMY_SUBSCRIPTION,
+    {
+      skip: !currentInvoice,
+      variables: subscriptionConfig?.variables || {},
+      onData: subscriptionConfig?.onData,
+    }
   )
 
   useEffect(() => {

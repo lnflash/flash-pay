@@ -151,6 +151,10 @@ export const useInvoice = (walletId?: string) => {
   }, [walletId, convertToSats, displayCurrency, createInvoiceWithAmount, createInvoiceNoAmount, dispatch])
 
   const subscribeToInvoiceStatus = useCallback((paymentRequest: string, paymentHash: string) => {
+    if (!paymentRequest || !paymentHash) {
+      return null
+    }
+    
     return {
       subscription: INVOICE_STATUS_SUBSCRIPTION,
       variables: {
