@@ -1,174 +1,31 @@
-import { useRouter } from "next/router"
-import React from "react"
-import Container from "react-bootstrap/Container"
-import Image from "react-bootstrap/Image"
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
+import { Box, CircularProgress } from '@mui/material'
 
-import ParsePayment from "../components/ParsePOSPayment"
-import PinToHomescreen from "../components/PinToHomescreen"
-import reducer, { ACTIONS } from "./_reducer"
-import styles from "./_user.module.css"
-import Head from "next/head"
-import CurrencyDropdown from "../components/Currency/currency-dropdown"
-import { gql } from "@apollo/client"
-import { useAccountDefaultWalletsQuery } from "../lib/graphql/generated"
-import LoadingComponent from "../components/loading"
-
-gql`
-  query accountDefaultWallets($username: Username!) {
-    accountDefaultWallet(username: $username) {
-      __typename
-      id
-      walletCurrency
-    }
-  }
-`
-
-function ReceivePayment() {
+// This page now redirects to the new POS implementation
+function LegacyUserPage() {
   const router = useRouter()
-  const { username, memo, display } = router.query
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  const { username } = router.query
 
-  let accountUsername: string
-  if (username == undefined) {
-    accountUsername = ""
-  } else {
-    accountUsername = username.toString()
-  }
-
-  if (!display) {
-    const displayFromLocal = localStorage.getItem("display") ?? "USD"
-    const queryString = window.location.search
-    const searchParams = new URLSearchParams(queryString)
-    searchParams.set("display", displayFromLocal)
-    const newQueryString = searchParams.toString()
-    window.history.pushState(null, "", "?" + newQueryString)
-  }
-
-  const manifestParams = new URLSearchParams()
-  if (memo) {
-    manifestParams.set("memo", memo.toString())
-  }
-
-  const {
-    data,
-    error: usernameError,
-    loading,
-  } = useAccountDefaultWalletsQuery({
-    variables: { username: accountUsername },
-  })
-
-  const [state, dispatch] = React.useReducer(reducer, {
-    currentAmount: "",
-    createdInvoice: false,
-    walletCurrency: data?.accountDefaultWallet.walletCurrency || "USD",
-    username: accountUsername,
-    pinnedToHomeScreenModalVisible: false,
-  })
-
-  React.useEffect(() => {
-    if (state.walletCurrency === data?.accountDefaultWallet.walletCurrency) {
-      return
+  useEffect(() => {
+    if (username) {
+      // Redirect to new POS page with username
+      router.replace(`/pos?username=${username}`)
     }
-    dispatch({
-      type: ACTIONS.UPDATE_WALLET_CURRENCY,
-      payload: data?.accountDefaultWallet.walletCurrency,
-    })
-    dispatch({ type: ACTIONS.UPDATE_USERNAME, payload: username })
-  }, [state, username, data])
+  }, [username, router])
 
   return (
-    <Container className={styles.payment_container}>
-      <Head>
-        <link
-          rel="manifest"
-          href={`/api/${username}/manifest?${manifestParams.toString()}`}
-          id="manifest"
-        />
-      </Head>
-      {loading ? (
-        <LoadingComponent />
-      ) : usernameError ? (
-        <div className={styles.error}>
-          <p>{`${usernameError.message}.`}</p>
-          <p>Please check the username in your browser URL and try again.</p>
-          <button
-            data-testid="nfc-btn"
-            className={styles.secondaryBtn}
-            style={{
-              borderRadius: "0.5em",
-              padding: "0.4rem",
-              fontWeight: "normal",
-            }}
-            onClick={() => {
-              localStorage.removeItem("username")
-              router.replace("/")
-            }}
-          >
-            Go back
-          </button>
-        </div>
-      ) : (
-        <>
-          <PinToHomescreen
-            pinnedToHomeScreenModalVisible={state.pinnedToHomeScreenModalVisible}
-            dispatch={dispatch}
-          />
-          <div className={styles.username_container}>
-            {state.createdInvoice && (
-              <button onClick={() => dispatch({ type: ACTIONS.BACK })}>
-                <Image
-                  src="/icons/chevron-left-icon.svg"
-                  alt="back button"
-                  width="10px"
-                  height="12px"
-                />
-              </button>
-            )}
-            <p className={styles.username}>{`Pay ${username}`}</p>
-            <div style={{ marginLeft: "12px", marginTop: "9px" }}>
-              <CurrencyDropdown
-                style={{
-                  border: "none",
-                  outline: "none",
-                  width: isIOS || isSafari ? "72px" : "56px",
-                  height: "42px",
-                  fontSize: "18px",
-                  backgroundColor: "white",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-                showOnlyFlag={true}
-                onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
-                  localStorage.setItem("display", newDisplayCurrency)
-                  router.push(
-                    {
-                      query: { ...router.query, display: newDisplayCurrency },
-                    },
-                    undefined,
-                    { shallow: true },
-                  )
-                  setTimeout(() => {
-                    // hard reload to re-calculate currency
-                    // in a future PR we can manage state globally for selected display currency
-                    window.location.reload()
-                  }, 100)
-                }}
-              />
-            </div>
-          </div>
-          {/* {memo && <p className={styles.memo}>{`Memo: ${memo}`}</p>} */}
-
-          <ParsePayment
-            state={state}
-            dispatch={dispatch}
-            defaultWalletCurrency={data?.accountDefaultWallet.walletCurrency}
-            walletId={data?.accountDefaultWallet.id}
-          />
-        </>
-      )}
-    </Container>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <CircularProgress />
+    </Box>
   )
 }
 
-export default ReceivePayment
+export default LegacyUserPage

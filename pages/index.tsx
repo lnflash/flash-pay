@@ -1,133 +1,142 @@
-import React from "react"
-import Card from "react-bootstrap/Card"
-import Col from "react-bootstrap/Col"
-import Container from "react-bootstrap/Container"
-import Jumbotron from "react-bootstrap/Jumbotron"
-import ListGroup from "react-bootstrap/ListGroup"
-import Row from "react-bootstrap/Row"
-import { gql, useQuery } from "@apollo/client"
-
-import { GRAPHQL_URI } from "../lib/config"
-import { useRouter } from "next/router"
-import CurrencyDropdown from "../components/Currency/currency-dropdown"
-
-const GET_NODE_STATS = gql`
-  query nodeIds {
-    globals {
-      nodesIds
-    }
-  }
-`
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import {
+  Container,
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Stack,
+} from '@mui/material'
+import { ArrowForward, PointOfSale } from '@mui/icons-material'
+import { CurrencySelector } from '../src/components/pos/CurrencySelector'
+import { useAppDispatch } from '../src/store/hooks'
+import { setUsername } from '../src/store/slices/authSlice'
+import { setDisplayCurrency } from '../src/store/slices/settingsSlice'
 
 function Home() {
-  const nodeUrl = GRAPHQL_URI.includes("staging")
-    ? `https://mempool.space/signet/lightning/node/`
-    : `https://mempool.space/lightning/node/`
-  const { loading, error, data } = useQuery(GET_NODE_STATS)
-  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState(
-    localStorage.getItem("display") ?? "JMD",
-  )
-
   const router = useRouter()
-  const [username, setUsername] = React.useState<string>("")
+  const dispatch = useAppDispatch()
+  const [usernameInput, setUsernameInput] = useState('')
+  const [mounted, setMounted] = useState(false)
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  useEffect(() => {
+    setMounted(true)
+    // Check if we have a stored username
+    const storedUsername = localStorage.getItem('username')
+    if (storedUsername) {
+      setUsernameInput(storedUsername)
+    }
+  }, [])
 
-    router.push(
-      {
-        pathname: username,
-        query: { display: selectedDisplayCurrency },
-      },
-      undefined,
-      { shallow: true },
-    )
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (usernameInput.trim()) {
+      localStorage.setItem('username', usernameInput)
+      dispatch(setUsername(usernameInput))
+      router.push(`/pos?username=${usernameInput}`)
+    }
+  }
+
+  if (!mounted) {
+    return null // Prevent hydration mismatch
   }
 
   return (
-    <Container>
-      <br />
-      <Row>
-        <Col>
-          <h2>Welcome the Flash Cash Register</h2>
-          <br />
-          <Jumbotron>
-            <Container>
-              <Row>
-                <Col>
-                  <Card>
-                    <Card.Body>
-                      <ListGroup variant="flush">
-                        {/* <ListGroup.Item>
-                          <label>Node Public Key: </label>{" "}
-                          <p style={{ fontSize: "small", overflowWrap: "break-word" }}>
-                            {error
-                              ? "Unavailable"
-                              : loading
-                              ? "Loading..."
-                              : data.globals.nodesIds[0]}
-                          </p>
-                        </ListGroup.Item> */}
-                        {/* <ListGroup.Item>
-                          {error ? (
-                            "Unavailable"
-                          ) : loading ? (
-                            "Loading..."
-                          ) : (
-                            <a href={nodeUrl + `${data.globals.nodesIds[0]}`}>
-                              Connect the Flash node
-                            </a>
-                          )}
-                        </ListGroup.Item> */}
-                        <ListGroup.Item>
-                          <form
-                            className="username-form"
-                            autoComplete="off"
-                            onSubmit={(event: React.FormEvent<HTMLFormElement>) =>
-                              handleSubmit(event)
-                            }
-                          >
-                            <label htmlFor="username">
-                              To use the <strong>Cash Register</strong>, enter your Flash
-                              username
-                            </label>
-                            <input
-                              type="text"
-                              name="username"
-                              value={username}
-                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                setUsername(event.target.value)
-                              }
-                              placeholder="username"
-                              required
-                            />
-                            <label htmlFor="display" style={{ alignSelf: "flex-start" }}>
-                              Enter your currency
-                            </label>
-                            <CurrencyDropdown
-                              name="display"
-                              style={{ height: "42px", width: "100%" }}
-                              onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
-                                if (newDisplayCurrency) {
-                                  localStorage.setItem("display", newDisplayCurrency)
-                                  setSelectedDisplayCurrency(newDisplayCurrency)
-                                }
-                              }}
-                            />
-                            <button>Submit</button>
-                          </form>
-                        </ListGroup.Item>
-                      </ListGroup>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-              <hr />
-            </Container>
-          </Jumbotron>
-        </Col>
-      </Row>
-    </Container>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper
+          elevation={10}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.98)',
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              mx: 'auto',
+              mb: 3,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #FF9500 0%, #FF6200 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(255, 149, 0, 0.4)',
+            }}
+          >
+            <PointOfSale sx={{ fontSize: 40, color: 'white' }} />
+          </Box>
+
+          <Typography variant="h4" gutterBottom fontWeight="bold">
+            Flash POS
+          </Typography>
+          
+          <Typography variant="body1" color="text.secondary" paragraph>
+            Lightning-fast Bitcoin payments for merchants
+          </Typography>
+
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={3} sx={{ mt: 4 }}>
+              <TextField
+                fullWidth
+                label="Flash Username"
+                placeholder="Enter your username"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                required
+                variant="outlined"
+                InputProps={{
+                  sx: { borderRadius: 2 }
+                }}
+              />
+
+              <CurrencySelector fullWidth />
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                endIcon={<ArrowForward />}
+                sx={{
+                  py: 1.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(135deg, #FF9500 0%, #FF6200 100%)',
+                  boxShadow: '0 4px 20px rgba(255, 149, 0, 0.3)',
+                  '&:hover': {
+                    boxShadow: '0 6px 30px rgba(255, 149, 0, 0.4)',
+                  },
+                }}
+              >
+                Open Cash Register
+              </Button>
+            </Stack>
+          </form>
+
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 3, display: 'block' }}
+          >
+            Powered by Lightning Network ⚡
+          </Typography>
+        </Paper>
+      </Container>
+    </Box>
   )
 }
 
