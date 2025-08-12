@@ -1,0 +1,14 @@
+{
+  "buildCommand": "yarn build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_GRAPHQL_HOSTNAME": "@graphql_hostname",
+    "NEXT_PUBLIC_GRAPHQL_HOSTNAME_INTERNAL": "@graphql_hostname_internal",
+    "NEXT_PUBLIC_GRAPHQL_URI_INTERNAL": "@graphql_uri_internal",
+    "NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL": "@graphql_websocket_url",
+    "NEXT_PUBLIC_BTCPAY_SERVER_URL": "@btcpay_server_url",
+    "NEXT_PUBLIC_PULL_PAYMENT_ID": "@pull_payment_id",
+    "NEXT_PUBLIC_PAYOUT_AMOUNT": "@payout_amount"
+  }
+}
