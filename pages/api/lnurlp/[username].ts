@@ -11,7 +11,11 @@ import type { NextApiRequest, NextApiResponse } from "next"
 
 import { requestPayServiceParams } from "lnurl-pay"
 
-import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import {
+  FLASH_WEBHOOK_HOSTNAME,
+  GRAPHQL_URI_INTERNAL,
+  NOSTR_PUBKEY,
+} from "../../../lib/config"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -24,7 +28,6 @@ const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
 
   return forward(operation)
 })
-
 const client = new ApolloClient({
   link: concat(
     ipForwardingMiddleware,
@@ -114,10 +117,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     console.log(`Failed to parse: ${lnurl}`)
     return res.status(500).end()
   }
+  const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/${accountUsername}`
 
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
-  return res.json({
-    callback: details.callback,
+  const result = {
+    callback: callbackUrl,
     maxSendable: details.max,
     minSendable: details.min,
     metadata: JSON.stringify(details.metadata),
@@ -127,7 +131,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     image: details.image,
     commentAllowed: details.commentAllowed,
     identifier: `${accountUsername}@${originalUrl(req).hostname}`, // not part of lud6
-  })
+    allowNostr: true,
+  }
+  return res.json(result)
 
   // const metadata = JSON.stringify([
   //   ["text/plain", `Payment to ${accountUsername}`],
