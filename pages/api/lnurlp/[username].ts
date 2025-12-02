@@ -116,7 +116,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     console.log(`Failed to parse: ${lnurl}`)
     return res.status(500).end()
   }
-  const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/${accountUsername}`
+  const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/lnurl/${accountUsername}`
 
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
   const result = {
