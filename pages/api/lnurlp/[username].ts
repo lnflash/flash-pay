@@ -11,7 +11,11 @@ import type { NextApiRequest, NextApiResponse } from "next"
 
 import { requestPayServiceParams } from "lnurl-pay"
 
-import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import {
+  FLASH_WEBHOOK_HOSTNAME,
+  GRAPHQL_URI_INTERNAL,
+  NOSTR_PUBKEY,
+} from "../../../lib/config"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -24,7 +28,6 @@ const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
 
   return forward(operation)
 })
-
 const client = new ApolloClient({
   link: concat(
     ipForwardingMiddleware,
@@ -55,7 +58,6 @@ const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
         "x-forwarded-for": req.headers["x-forwarded-for"],
       },
     })
-    console.log(data)
     return data?.accountDefaultWallet?.lnurlp
   } catch (err) {
     console.log("error getting lnurl for user:", err)
@@ -94,7 +96,7 @@ const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   // console.log(NOSTR_PUBKEY)
 
-  const { username, nostr } = req.query
+  const { username } = req.query
 
   if (!username) {
     return res.status(400).end("username is required")
@@ -114,10 +116,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     console.log(`Failed to parse: ${lnurl}`)
     return res.status(500).end()
   }
+  const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/lnurl/${accountUsername}`
 
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
-  return res.json({
-    callback: details.callback,
+  const result = {
+    callback: callbackUrl,
     maxSendable: details.max,
     minSendable: details.min,
     metadata: JSON.stringify(details.metadata),
@@ -127,7 +130,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     image: details.image,
     commentAllowed: details.commentAllowed,
     identifier: `${accountUsername}@${originalUrl(req).hostname}`, // not part of lud6
-  })
+    allowNostr: true,
+    nostrPubkey: NOSTR_PUBKEY,
+  }
+  return res.json(result)
 
   // const metadata = JSON.stringify([
   //   ["text/plain", `Payment to ${accountUsername}`],
