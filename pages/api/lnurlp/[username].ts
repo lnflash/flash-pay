@@ -39,8 +39,8 @@ const client = new ApolloClient({
 })
 
 const LNURL_DEFAULT_WALLET = gql`
-  query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
-    accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
+  query accountDefaultWallet($username: Username!) {
+    accountDefaultWallet(username: $username) {
       __typename
       id
       walletCurrency
@@ -48,11 +48,12 @@ const LNURL_DEFAULT_WALLET = gql`
     }
   }
 `
+
 const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
   try {
     const { data } = await client.query({
       query: LNURL_DEFAULT_WALLET,
-      variables: { username: accountUsername, walletCurrency: "USD" },
+      variables: { username: accountUsername },
       context: {
         "x-real-ip": req.headers["x-real-ip"],
         "x-forwarded-for": req.headers["x-forwarded-for"],
