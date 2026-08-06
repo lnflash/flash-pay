@@ -16,6 +16,7 @@ import {
   GRAPHQL_URI_INTERNAL,
   NOSTR_PUBKEY,
 } from "../../../lib/config"
+import { lnurlSendableFields } from "../../../lib/lnurl"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -118,12 +119,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
   const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/lnurl/${accountUsername}`
 
+  const { minSendable, maxSendable, metadata } = lnurlSendableFields(details)
+
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
   const result = {
     callback: callbackUrl,
-    maxSendable: details.max,
-    minSendable: details.min,
-    metadata: JSON.stringify(details.metadata),
+    maxSendable,
+    minSendable,
+    metadata,
     tag: "payRequest",
     domain: details.domain,
     description: details.description,
