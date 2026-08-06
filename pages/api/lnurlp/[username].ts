@@ -16,6 +16,7 @@ import {
   GRAPHQL_URI_INTERNAL,
   NOSTR_PUBKEY,
 } from "../../../lib/config"
+import { lnurlSendableFields } from "../../../lib/lnurl"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -118,32 +119,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
   const callbackUrl = `https://${FLASH_WEBHOOK_HOSTNAME}/pay/lnurl/${accountUsername}`
 
-  // LUD-06 requires min/maxSendable in MILLISATS, but lnurl-pay's
-  // requestPayServiceParams converts the service's values to SATS
-  // (details.min/max). Re-emitting them unconverted advertised limits 1000x
-  // too low (150k sats instead of 150M), so compliant wallets refused any
-  // larger payment. Prefer the service's raw msat values; fall back to
-  // sats * 1000.
-  const rawData = details.rawData as
-    | { minSendable?: number | string; maxSendable?: number | string }
-    | undefined
-  const rawMinSendable = Number(rawData?.minSendable)
-  const rawMaxSendable = Number(rawData?.maxSendable)
-  const minSendable =
-    Number.isFinite(rawMinSendable) && rawMinSendable > 0
-      ? rawMinSendable
-      : Number(details.min) * 1000
-  const maxSendable =
-    Number.isFinite(rawMaxSendable) && rawMaxSendable > 0
-      ? rawMaxSendable
-      : Number(details.max) * 1000
+  const { minSendable, maxSendable, metadata } = lnurlSendableFields(details)
 
   // Response must meet LUD-6 requirements: https://github.com/lnurl/luds/blob/luds/06.md
   const result = {
     callback: callbackUrl,
     maxSendable,
     minSendable,
-    metadata: JSON.stringify(details.metadata),
+    metadata,
     tag: "payRequest",
     domain: details.domain,
     description: details.description,
