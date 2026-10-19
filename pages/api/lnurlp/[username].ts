@@ -53,6 +53,7 @@ const getLnurl = async (accountUsername: string, req: NextApiRequest) => {
   try {
     const { data } = await client.query({
       query: LNURL_DEFAULT_WALLET,
+      fetchPolicy: "no-cache",
       variables: { username: accountUsername, walletCurrency: "USD" },
       context: {
         "x-real-ip": req.headers["x-real-ip"],
